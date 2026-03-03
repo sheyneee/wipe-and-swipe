@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 export const CreateAdminSchema = z.object({
-  firstName: z.string().min(1).max(80),
-  middleName: z.string().max(80).optional(),
-  lastName: z.string().min(1).max(80),
+  firstName: z.string().min(2).max(80),
+  middleName: z.string().trim().max(80).optional(),
+  lastName: z.string().min(2).max(80),
   email: z.string().email().max(254),
   password: z.string().min(8).max(72),
 });

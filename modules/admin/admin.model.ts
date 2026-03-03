@@ -1,4 +1,5 @@
 import mongoose, { Schema, type InferSchemaType } from "mongoose";
+import { minLength } from "zod";
 
 export const AdminRoleEnum = ["SUPER_ADMIN", "ADMIN"] as const;
 export type AdminRole = (typeof AdminRoleEnum)[number];
@@ -8,9 +9,9 @@ export type AdminStatus = (typeof AdminStatusEnum)[number];
 
 const AdminSchema = new Schema(
   {
-    firstName: { type: String, required: true, trim: true, maxlength: 80 },
+    firstName: { type: String, required: true, trim: true, minlength: 2, maxlength: 80 },
     middleName: { type: String, trim: true, maxlength: 80 },
-    lastName: { type: String, required: true, trim: true, maxlength: 80 },
+    lastName: { type: String, required: true, trim: true, minlength: 2, maxlength: 80 },
 
     role: { type: String, enum: AdminRoleEnum, required: true, index: true },
     status: { type: String, enum: AdminStatusEnum, required: true, index: true },
@@ -18,10 +19,8 @@ const AdminSchema = new Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
       trim: true,
-      index: true,
       maxlength: 254,
     },
 

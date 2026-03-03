@@ -101,8 +101,36 @@ export async function loginAdmin(emailRaw: string, password: string) {
   const valid = await bcrypt.compare(password, passwordHash);
   if (!valid) throw new HttpError(401, "Invalid credentials");
 
-  if (!admin.emailVerified) throw new HttpError(403, "Email not verified");
-  if (admin.status !== "ACTIVE") throw new HttpError(403, "Account not approved");
+  if (!admin.emailVerified) {
+  const now = new Date();
+  const expiresAt = admin.emailVerifyExpiresAt;
+
+  const hasUnexpiredLink = !!expiresAt && expiresAt.getTime() > now.getTime();
+
+  // Only resend if there is no active (unexpired) link.
+  if (!hasUnexpiredLink) {
+    await sendVerificationEmail(String(admin._id), admin.email, admin.firstName);
+    throw new HttpError(
+      403,
+      "Email not verified. A new verification link was sent to your email."
+    );
+  }
+
+  // Link still valid. Do not resend.
+  throw new HttpError(
+    403,
+    "Email not verified. Please check your email for the verification link."
+  );
+}
+  if (admin.status !== "ACTIVE") {
+    if (admin.status === "PENDING") {
+      throw new HttpError(403, "Your account is pending approval. Please wait for activation.");
+    }
+    if (admin.status === "SUSPENDED") {
+      throw new HttpError(403, "Your account has been suspended. Please contact support.");
+    }
+    throw new HttpError(403, "Your account is not active.");
+  }
 
   const token = signAdminToken({
     userId: String(admin._id),
@@ -255,7 +283,7 @@ export async function verifyEmail(adminId: string, token: string) {
   admin.emailVerifyExpiresAt = undefined;
 
   await admin.save();
-  return { success: true };
+  return { success: true, accountStatus: admin.status };
 }
 
 /**
