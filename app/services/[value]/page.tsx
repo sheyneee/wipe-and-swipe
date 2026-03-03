@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SERVICES } from "@/lib/data/services";
-import { BRAND } from "@/lib/config/brand"; // adjust path if yours is different
 import BackButton from "@/components/ui/BackButton";
 
 type PageProps = {
