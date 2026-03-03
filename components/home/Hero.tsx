@@ -17,7 +17,7 @@ export default function Hero() {
             Wipe & Swipe:
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-accent">
-                We Clean. You Relax.
+                Where Clean Meets Care
             </span>
           </h1>
 

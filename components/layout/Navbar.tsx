@@ -27,11 +27,16 @@ export default function Navbar() {
                 priority
               />
             </div>
-            <div>
-              <span className="text-2xl font-bold text-brand-primary">Wipe</span>
-              <span className="text-2xl font-bold text-brand-secondary"> &amp; </span>
-              <span className="text-2xl font-bold text-brand-accent">Swipe</span>
+          <div className="leading-tight">
+            <div className="text-2xl font-bold">
+              <span className="text-brand-primary">Wipe</span>
+              <span className="text-brand-secondary"> and </span>
+              <span className="text-brand-accent">Swipe</span>
             </div>
+            <div className="text-xs md:text-sm font-medium tracking-wide text-gray-500">
+              Cleaning Services Ltd
+            </div>
+          </div>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
