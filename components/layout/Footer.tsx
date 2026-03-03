@@ -28,12 +28,12 @@ export default function Footer() {
             <ul className="space-y-2 text-gray-400">
               <li><Link href="/" className="hover:text-teal-400 transition-colors">Home</Link></li>
               <li><Link href="/#services" className="hover:text-teal-400 transition-colors">Services</Link></li>
-              <li><Link href="/about" className="hover:text-teal-400 transition-colors">About Us</Link></li>
-              <li><Link href="/#contact" className="hover:text-teal-400 transition-colors">Contact</Link></li>
+              <li><Link href="/about-us" className="hover:text-teal-400 transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="hover:text-teal-400 transition-colors">Contact Us</Link></li>
             </ul>
           </div>
 
-          <div>
+          <div> 
             <h4 className="font-bold text-lg mb-4">Services</h4>
             <ul className="space-y-2 text-gray-400">
               <li><Link href="/#services" className="hover:text-teal-400 transition-colors">Residential</Link></li>

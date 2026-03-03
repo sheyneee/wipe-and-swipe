@@ -32,7 +32,7 @@ export default function ContactPage() {
             Contact Us
           </h1>
           <p className="mt-3 text-lg text-slate-600 max-w-2xl">
-            Send us your details and we will get back to you. You can also call or message us on WhatsApp.
+            Get your free quote today. Fill out the form and our team will respond as soon as possible. You may also call or text us directly — our lines are open 24/7.
           </p>
         </div>
 
@@ -53,10 +53,9 @@ export default function ContactPage() {
               <h2 className="text-2xl font-bold" style={{ color: BRAND.primary }}>
                 Quick Response
               </h2>
-              <p className="mt-2 text-slate-700">
-                We aim to respond to all inquiries within 24 hours. For urgent matters, please call or text us
-                directly.
-              </p>
+            <p className="mt-2 text-slate-700">
+              We’re available 24 hours a day to assist you. For urgent matters, please call or text us directly.
+            </p>
             </div>
 
             <div>
@@ -64,7 +63,7 @@ export default function ContactPage() {
                 Available Hours
               </h2>
               <p className="mt-2 text-slate-700">
-                Monday . Sunday: 8:00 AM . 6:00 PM
+                Monday . Sunday: 9:00 AM . 5:00 PM
                 <br />
                 Emergency cleaning available upon request
               </p>

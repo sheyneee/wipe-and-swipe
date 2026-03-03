@@ -101,9 +101,9 @@ export default function HomeContactSection() {
               Ready for a Sparkling Clean Space?
             </h2>
 
-            <p className="text-gray-600 text-lg mb-8">
-              Get your free quote today. Fill out the form and we will get back to you within 24 hours.
-            </p>
+          <p className="text-gray-600 text-lg mb-8">
+            Get your free quote today. Fill out the form and our team will respond as soon as possible. You may also call or text us directly — our lines are open 24/7.
+          </p>
 
             <div className="space-y-6">
               <div className="flex items-center gap-4">
@@ -256,7 +256,7 @@ export default function HomeContactSection() {
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">Thank You!</h3>
                 <p className="text-gray-600">
-                  We have received your request and will get back to you within 24 hours.
+                  We have received your request. Our team will contact you as soon as possible.
                 </p>
               </div>
             )}
