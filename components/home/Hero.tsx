@@ -14,10 +14,10 @@ export default function Hero() {
           </div>
 
           <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-gray-800 leading-tight mb-6">
-            Deep Cleaning
+            Wipe & Swipe:
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-accent">
-              Services
+                We Clean. You Relax.
             </span>
           </h1>
 
