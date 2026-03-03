@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { BRAND } from "@/lib/config/brand"; 
+import Swal from "sweetalert2";
 
 type CSSVars = React.CSSProperties & { [key: `--${string}`]: string };
 const RING_STYLE: CSSVars = { "--tw-ring-color": "rgba(41,98,118,0.25)" };
@@ -53,7 +54,12 @@ export default function ClientContactForm() {
           if (!res.ok) throw new Error(errMsg || "Failed to send message.");
 
           form.reset();
-          alert("Message sent. We will get back to you as soon as possible.");
+          await Swal.fire({
+            icon: "success",
+            title: "Message Sent",
+            text: "We will get back to you as soon as possible.",
+            confirmButtonColor: "#296276",
+          });
         } catch (err: unknown) {
           const message = err instanceof Error ? err.message : "Something went wrong.";
           alert(message);

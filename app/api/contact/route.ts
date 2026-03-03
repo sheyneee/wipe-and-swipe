@@ -3,7 +3,7 @@ import { Resend } from "resend";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const CONTACT_FROM_EMAIL =
-  process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev";
+  process.env.CONTACT_FROM_EMAIL || "no-reply@wipeandswipe.co.nz";
 
 // Always send to this inbox
 const CONTACT_TO_EMAIL =
@@ -93,7 +93,7 @@ export async function POST(req: Request) {
       from,
       to: [CONTACT_TO_EMAIL],
       replyTo: body.email.trim(), // clicking reply goes to the customer
-      subject: `[Contact] ${body.subject.trim()}`,
+      subject: `Contact Form: ${body.subject.trim()}`,
       text: [
         `Name: ${body.name.trim()}`,
         `Email: ${body.email.trim()}`,
