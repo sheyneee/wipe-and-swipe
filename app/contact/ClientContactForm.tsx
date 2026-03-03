@@ -62,7 +62,12 @@ export default function ClientContactForm() {
           });
         } catch (err: unknown) {
           const message = err instanceof Error ? err.message : "Something went wrong.";
-          alert(message);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: message,
+            confirmButtonColor: "#296276",
+          });
         } finally {
           if (btn) {
             btn.disabled = false;
