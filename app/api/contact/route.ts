@@ -2,10 +2,12 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const CONTACT_FROM_EMAIL = process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev";
+const CONTACT_FROM_EMAIL =
+  process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev";
 
 // Always send to this inbox
-const CONTACT_TO_EMAIL = process.env.CONTACT_TO_EMAIL ?? "wipeandswipecs@gmail.com";
+const CONTACT_TO_EMAIL =
+  process.env.CONTACT_TO_EMAIL ?? "wipeandswipecs@gmail.com";
 
 type ContactPayload = {
   name: string;
@@ -19,8 +21,8 @@ function isNonEmptyString(v: unknown): v is string {
   return typeof v === "string" && v.trim().length > 0;
 }
 
-function isOptionalString(v: unknown): v is string | undefined {
-  return v === undefined || typeof v === "string";
+function isOptionalNonEmptyString(v: unknown): v is string | undefined {
+  return v === undefined || isNonEmptyString(v);
 }
 
 function isContactPayload(x: unknown): x is ContactPayload {
@@ -32,8 +34,22 @@ function isContactPayload(x: unknown): x is ContactPayload {
     isNonEmptyString(o.email) &&
     isNonEmptyString(o.subject) &&
     isNonEmptyString(o.message) &&
-    isOptionalString(o.phone)
+    isOptionalNonEmptyString(o.phone)
   );
+}
+
+/**
+ * Very small in-memory rate limit (best-effort).
+ * Note. In serverless this may reset between invocations.
+ */
+const hits = new Map<string, { count: number; ts: number }>();
+const WINDOW_MS = 60_000; // 1 minute
+const MAX_HITS = 10;
+
+function getClientIp(req: Request) {
+  const xf = req.headers.get("x-forwarded-for");
+  if (!xf) return "unknown";
+  return xf.split(",")[0]?.trim() || "unknown";
 }
 
 export async function POST(req: Request) {
@@ -45,7 +61,23 @@ export async function POST(req: Request) {
       );
     }
 
-    // Create client only when key exists
+    // Rate limit
+    const ip = getClientIp(req);
+    const now = Date.now();
+    const prev = hits.get(ip);
+
+    if (!prev || now - prev.ts > WINDOW_MS) {
+      hits.set(ip, { count: 1, ts: now });
+    } else {
+      prev.count += 1;
+      if (prev.count > MAX_HITS) {
+        return NextResponse.json(
+          { error: "Too many requests. Please try again shortly." },
+          { status: 429 }
+        );
+      }
+    }
+
     const resend = new Resend(RESEND_API_KEY);
 
     const body: unknown = await req.json().catch(() => null);
@@ -53,14 +85,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid payload." }, { status: 400 });
     }
 
-    // You must use a sender you have verified in Resend.
-    // For production, CONTACT_FROM_EMAIL should be a verified domain sender (hello@wipeandswipe.co.nz).
+    // NOTE: Without a domain, keep using onboarding@resend.dev for FROM.
+    // TO can be your Gmail inbox.
     const from = `Wipe & Swipe <${CONTACT_FROM_EMAIL}>`;
 
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from,
       to: [CONTACT_TO_EMAIL],
-      replyTo: body.email,
+      replyTo: body.email.trim(), // clicking reply goes to the customer
       subject: `[Contact] ${body.subject.trim()}`,
       text: [
         `Name: ${body.name.trim()}`,
@@ -71,7 +103,10 @@ export async function POST(req: Request) {
       ].join("\n"),
     });
 
-    return NextResponse.json({ ok: true }, { status: 200 });
+    return NextResponse.json(
+      { ok: true, id: result.data?.id ?? null },
+      { status: 200 }
+    );
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to send.";
     return NextResponse.json({ error: message }, { status: 500 });

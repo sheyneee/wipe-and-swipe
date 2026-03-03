@@ -1,41 +1,97 @@
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
 
-type ContactFormState = {
+type HomeContactPayload = {
   name: string;
-  phone: string;
+  phone?: string;
   email: string;
-  service: string;
+  subject: string;
   message: string;
 };
 
-export default function ContactSection() {
-  const [form, setForm] = useState<ContactFormState>({
+function isNonEmpty(v: string) {
+  return v.trim().length > 0;
+}
+
+export default function HomeContactSection() {
+  const [form, setForm] = React.useState<HomeContactPayload>({
     name: "",
     phone: "",
     email: "",
-    service: "",
+    subject: "",
     message: "",
   });
 
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = React.useState<
+    | { state: "idle" }
+    | { state: "loading" }
+    | { state: "success" }
+    | { state: "error"; message: string }
+  >({ state: "idle" });
 
   function onChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   }
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setSubmitted(true);
+
+    if (
+      !isNonEmpty(form.name) ||
+      !isNonEmpty(form.email) ||
+      !isNonEmpty(form.subject) ||
+      !isNonEmpty(form.message)
+    ) {
+      setStatus({
+        state: "error",
+        message: "Please complete all required fields.",
+      });
+      return;
+    }
+
+    setStatus({ state: "loading" });
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          phone: isNonEmpty(form.phone || "") ? form.phone : undefined,
+          email: form.email,
+          subject: form.subject,
+          message: form.message,
+        }),
+      });
+
+      const json = (await res.json().catch(() => null)) as
+        | { ok?: boolean; error?: string }
+        | null;
+
+      if (!res.ok || !json?.ok) {
+        setStatus({
+          state: "error",
+          message: json?.error || "Unable to send your message. Please try again.",
+        });
+        return;
+      }
+
+      setStatus({ state: "success" });
+      setForm({ name: "", phone: "", email: "", subject: "", message: "" });
+    } catch {
+      setStatus({ state: "error", message: "Network error. Please try again." });
+    }
   }
 
   return (
     <section id="contact" className="py-24 bg-gradient-to-b from-teal-50 to-white">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16">
+          {/* Left column (info) */}
           <div>
             <span className="inline-block px-4 py-2 bg-teal-100 text-teal-700 font-semibold rounded-full text-sm mb-4">
               Get In Touch
@@ -46,7 +102,7 @@ export default function ContactSection() {
             </h2>
 
             <p className="text-gray-600 text-lg mb-8">
-              Get your free quote today! Fill out the form and we’ll get back to you within 24 hours.
+              Get your free quote today. Fill out the form and we will get back to you within 24 hours.
             </p>
 
             <div className="space-y-6">
@@ -83,43 +139,57 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">Location</div>
-                  <div className="text-lg font-semibold text-gray-800">Castlecliff, Whanganui, New Zealand, 4501</div>
+                  <div className="text-lg font-semibold text-gray-800">
+                    155A Harrison Street, Whanganui, New Zealand
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
+          {/* Right column (form) */}
           <div className="bg-white rounded-3xl p-8 md:p-10 shadow-xl">
-            {!submitted ? (
+            {status.state !== "success" ? (
               <form onSubmit={onSubmit} className="space-y-6">
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                    <label htmlFor="home-contact-name" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Full Name <span className="text-red-500">*</span>
+                    </label>
                     <input
+                      id="home-contact-name"
                       name="name"
                       value={form.name}
                       onChange={onChange}
                       required
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
                       placeholder="John Doe"
+                      autoComplete="name"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
+                    <label htmlFor="home-contact-phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Phone Number
+                    </label>
                     <input
+                      id="home-contact-phone"
                       name="phone"
-                      value={form.phone}
+                      value={form.phone || ""}
                       onChange={onChange}
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
-                      placeholder="(555) 123-4567"
+                      placeholder="(+64) 21 000 0000"
+                      autoComplete="tel"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                  <label htmlFor="home-contact-email" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
                   <input
+                    id="home-contact-email"
                     name="email"
                     type="email"
                     value={form.email}
@@ -127,44 +197,51 @@ export default function ContactSection() {
                     required
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
                     placeholder="john@example.com"
+                    autoComplete="email"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Service Needed</label>
-                  <select
-                    name="service"
-                    value={form.service}
+                  <label htmlFor="home-contact-subject" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Subject <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="home-contact-subject"
+                    name="subject"
+                    value={form.subject}
                     onChange={onChange}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all bg-white"
-                  >
-                    <option value="">Select a service</option>
-                    <option value="residential">Residential Cleaning</option>
-                    <option value="commercial">Commercial Cleaning</option>
-                    <option value="deep">Deep Cleaning</option>
-                    <option value="airbnb">Airbnb Cleaning</option>
-                    <option value="window">Window Cleaning</option>
-                    <option value="onetime">One-Time Cleaning</option>
-                  </select>
+                    required
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+                    placeholder="Request a quote"
+                  />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Message</label>
+                  <label htmlFor="home-contact-message" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Message <span className="text-red-500">*</span>
+                  </label>
                   <textarea
+                    id="home-contact-message"
                     name="message"
                     value={form.message}
                     onChange={onChange}
                     rows={4}
+                    required
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all resize-none"
                     placeholder="Tell us about your cleaning needs..."
                   />
                 </div>
 
+                {status.state === "error" ? (
+                  <p className="text-sm text-red-600">{status.message}</p>
+                ) : null}
+
                 <button
                   type="submit"
-                  className="w-full py-4 bg-gradient-to-r from-teal-500 to-teal-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                  disabled={status.state === "loading"}
+                  className="w-full py-4 bg-gradient-to-r from-teal-500 to-teal-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <span>Get Free Quote</span>
+                  <span>{status.state === "loading" ? "Sending..." : "Get Free Quote"}</span>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
@@ -178,7 +255,9 @@ export default function ContactSection() {
                   </svg>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">Thank You!</h3>
-                <p className="text-gray-600">We’ve received your request and will get back to you within 24 hours.</p>
+                <p className="text-gray-600">
+                  We have received your request and will get back to you within 24 hours.
+                </p>
               </div>
             )}
           </div>

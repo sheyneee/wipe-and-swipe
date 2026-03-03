@@ -103,7 +103,7 @@ function ContactInfoCard() {
         <div className="flex gap-4">
           <div
             className="w-12 h-12 rounded-2xl grid place-items-center text-white"
-            style={{ background: `linear-gradient(135deg, ${BRAND.primary}, ${BRAND.accent})` }}
+            style={{ background: `linear-gradient(135deg, ${BRAND.secondary}, ${BRAND.accent})` }}
             aria-hidden
           >
             ☎
@@ -164,7 +164,7 @@ function ContactInfoCard() {
               <a
                 href={`mailto:${email}`}
                 className="inline-flex px-4 py-2 rounded-xl text-white font-semibold hover:opacity-90"
-                style={{ backgroundColor: BRAND.secondary }}
+                style={{ backgroundColor: BRAND.primary }}
               >
                 Send Email
               </a>
@@ -185,13 +185,13 @@ function ContactInfoCard() {
           <div className="flex-1">
             <div className="text-sm text-slate-500">Location</div>
             <div className="font-semibold text-slate-900">
-              Castlecliff, Whanganui
+              155A Harrison Street,
               <br />
-              New Zealand, 4501
+               Whanganui, New Zealand
             </div>
             <div className="mt-3">
               <a
-                href="https://www.google.com/maps/search/Castlecliff+Whanganui+4501"
+                href="https://maps.app.goo.gl/Vpc8sHKE4oxgCRgk8"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex px-4 py-2 rounded-xl text-white font-semibold hover:opacity-90"
