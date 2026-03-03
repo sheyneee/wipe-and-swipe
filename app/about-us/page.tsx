@@ -6,30 +6,26 @@ export const metadata = {
   description: "About Wipe & Swipe Cleaning Services",
 };
 
+const BRAND = {
+  primary: "#296276",
+  secondary: "#283955",
+  accent: "#266075",
+  white: "#ffffff",
+};
+
 export default function AboutPage() {
   return (
     <main className="min-h-screen pt-24 pb-12 px-6 bg-gradient-to-b from-white to-blue-50">
       <div className="max-w-4xl mx-auto">
         {/* Back button */}
-        <Link
-          href="/"
-          className="mb-6 inline-flex items-center gap-2 text-[color:var(--color-brand-primary)] hover:text-[color:var(--color-brand-secondary)] transition-colors"
-        >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 font-semibold hover:opacity-80"
+            style={{ color: BRAND.primary }}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          <span>Back to Home</span>
-        </Link>
+            <span aria-hidden>←</span>
+            Back to Home
+          </Link>
 
         {/* Header */}
         <div className="mb-12">

@@ -1,12 +1,6 @@
 import Link from "next/link";
 import ClientContactForm from "./ClientContactForm";
-
-const BRAND = {
-  primary: "#296276",
-  secondary: "#283955",
-  accent: "#266075",
-  white: "#ffffff",
-};
+import { BRAND } from "@/lib/config/brand"; 
 
 export default function ContactPage() {
   return (

@@ -36,7 +36,7 @@ export default function Navbar() {
 
           <div className="hidden md:flex items-center gap-8">
             <Link href="/" className="nav-link text-gray-700 font-medium hover:text-brand-primary transition-colors">Home</Link>
-            <button onClick={() => scrollToId("services")} className="nav-link text-gray-700 font-medium hover:text-brand-primary transition-colors">Services</button>
+            <Link href="/services" className="nav-link text-gray-700 font-medium hover:text-brand-primary transition-colors">Services</Link>
              <Link href="/about-us" className="nav-link text-gray-700 font-medium hover:text-[color:var(--color-brand-primary)] transition-colors">
                 About Us
              </Link>
@@ -61,7 +61,7 @@ export default function Navbar() {
           <div className="md:hidden pt-4 pb-2 border-t mt-4">
             <div className="flex flex-col gap-4">
               <Link href="/" onClick={() => setOpen(false)} className="text-gray-700 font-medium hover:text-brand-primary">Home</Link>
-              <Link href="/#services" onClick={() => setOpen(false)} className="text-gray-700 font-medium hover:text-brand-primary">Services</Link>
+              <Link href="/services" onClick={() => setOpen(false)} className="text-gray-700 font-medium hover:text-brand-primary">Services</Link>
               <Link href="/about-us" className="nav-link text-gray-700 font-medium hover:text-[color:var(--color-brand-primary)] transition-colors">
                 About
               </Link>

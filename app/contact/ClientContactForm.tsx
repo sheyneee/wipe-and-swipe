@@ -1,13 +1,7 @@
 "use client";
 
 import type React from "react";
-
-const BRAND = {
-  primary: "#296276",
-  secondary: "#283955",
-  accent: "#266075",
-  white: "#ffffff",
-};
+import { BRAND } from "@/lib/config/brand"; 
 
 type CSSVars = React.CSSProperties & { [key: `--${string}`]: string };
 const RING_STYLE: CSSVars = { "--tw-ring-color": "rgba(41,98,118,0.25)" };
