@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SERVICES } from "@/lib/data/services";
 
 export default function ServicesGrid() {
@@ -18,10 +19,11 @@ export default function ServicesGrid() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {SERVICES.map((s) => (
-            <div
+            <article
               key={s.value}
-              className="service-card bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-100"
+              className="service-card bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-100 flex flex-col"
             >
+              {/* Top */}
               <div
                 className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
                 style={{
@@ -29,24 +31,33 @@ export default function ServicesGrid() {
                   boxShadow: "0 10px 20px rgba(41, 98, 118, 0.3)",
                 }}
               >
-                <span className="text-2xl text-white">{s.emoji}</span>
+                <span className="text-2xl text-white" aria-hidden>
+                  {s.emoji}
+                </span>
               </div>
 
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                 {s.title}
-              </h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">{s.title}</h3>
               <p className="text-brand-primary font-semibold text-lg mb-4">{s.price}</p>
               <p className="text-gray-600 mb-4 text-sm leading-relaxed">{s.description}</p>
 
-              <ul className="space-y-2 text-gray-600 text-sm">
+              {/* Middle (fills space) */}
+              <ul className="space-y-2 text-gray-600 text-sm flex-1">
                 {s.bullets.map((b, idx) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <span className="text-brand-primary">✓</span>
+                    <span className="text-brand-primary font-bold">✓</span>
                     <span>{b}</span>
                   </li>
                 ))}
               </ul>
-            </div>
+
+              {/* Bottom (fixed to bottom of card) */}
+              <Link
+                href={`/services/${s.value}`}
+                className="mt-6 block w-full text-center py-3 bg-[color:rgba(41,98,118,0.10)] text-[color:var(--brand-primary,#296276)] font-semibold rounded-lg transition-all duration-300 hover:bg-[color:var(--brand-primary,#296276)] hover:text-white"
+              >
+                View Details
+              </Link>
+            </article>
           ))}
         </div>
       </div>
