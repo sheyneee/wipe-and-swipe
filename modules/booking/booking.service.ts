@@ -35,10 +35,18 @@ export async function listBookings(status?: string) {
   return Booking.find(query).sort({ createdAt: -1 }).lean();
 }
 
-export async function updateBookingStatus(id: string, status: string) {
+export async function updateBooking(
+  id: string,
+  patch: { status?: string; price?: number | null }
+) {
   await dbConnect();
 
-  const updated = await Booking.findByIdAndUpdate(id, { status }, { new: true }).lean();
+  const updated = await Booking.findByIdAndUpdate(
+    id,
+    { $set: patch },
+    { new: true }
+  ).lean();
+
   if (!updated) throw new HttpError(404, "Booking not found");
 
   return updated;

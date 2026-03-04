@@ -1,5 +1,5 @@
-import { CreateBookingSchema, UpdateBookingStatusSchema } from "./booking.validator";
-import { createBooking, listBookings, updateBookingStatus } from "./booking.service";
+import { CreateBookingSchema, UpdateBookingSchema } from "./booking.validator";
+import { createBooking, listBookings, updateBooking } from "./booking.service";
 
 export async function handleCreateBooking(req: Request) {
   const body = CreateBookingSchema.parse(await req.json());
@@ -13,6 +13,7 @@ export async function handleListBookings(req: Request) {
 }
 
 export async function handleUpdateBooking(req: Request, id: string) {
-  const body = UpdateBookingStatusSchema.parse(await req.json());
-  return updateBookingStatus(id, body.status);
+  const json = await req.json();
+  const parsed = UpdateBookingSchema.parse(json);
+  return updateBooking(id, parsed);
 }

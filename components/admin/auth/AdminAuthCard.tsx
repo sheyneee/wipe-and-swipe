@@ -447,6 +447,7 @@ async function handleRegister(e: React.FormEvent) {
                     placeholder="John"
                     autoComplete="given-name"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Minimum 2 characters</p>
                 </div>
 
                 <div>
@@ -464,6 +465,7 @@ async function handleRegister(e: React.FormEvent) {
                     placeholder="Doe"
                     autoComplete="family-name"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Minimum 2 characters</p>
                 </div>
               </div>
 

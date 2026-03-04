@@ -60,6 +60,13 @@ const BookingSchema = new Schema(
       maxlength: 500,
     },
 
+    price: {
+      type: Number,
+      required: false,
+      default: null,
+      min: 0
+    },
+
     status: {
       type: String,
       enum: ["PENDING", "CONFIRMED", "DECLINED", "CANCELLED", "COMPLETED"],

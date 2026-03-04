@@ -10,10 +10,14 @@ export const CreateBookingSchema = z.object({
 
   preferredDate: z.string().min(1), // ISO date string from frontend
   preferredTime: z.string().min(1).max(20),
-
   specialRequests: z.string().max(500).optional(),
 });
 
-export const UpdateBookingStatusSchema = z.object({
-  status: z.enum(["PENDING", "CONFIRMED", "DECLINED", "CANCELLED", "COMPLETED"]),
-});
+export const UpdateBookingSchema = z
+  .object({
+    status: z.enum(["PENDING", "CONFIRMED", "DECLINED", "CANCELLED", "COMPLETED"]).optional(),
+    price: z.union([z.coerce.number().min(0), z.null()]).optional(),
+  })
+  .refine((v) => v.status !== undefined || v.price !== undefined, {
+    message: "At least one field must be provided.",
+  });
