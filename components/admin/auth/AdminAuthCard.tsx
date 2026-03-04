@@ -361,7 +361,7 @@ async function handleRegister(e: React.FormEvent) {
       {/* Header OUTSIDE the card */}
       <div className="text-center mb-10">
         <h1 className="text-4xl font-bold text-brand-primary mb-2">Welcome</h1>
-        <p className="text-brand-light text-lg font-semibold">Sign in or create an account</p>
+        <p className="text-brand-accent text-lg font-semibold">Sign in or create an account</p>
       </div>
 
       {/* Main Card */}
