@@ -196,7 +196,7 @@ export default function BookingForm() {
           disabled={loading}
           className="w-full py-4 bg-gradient-to-r from-brand-primary to-brand-accent text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-brand-primary/30 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:translate-y-0"
         >
-          <span>{loading ? "Submitting..." : "Confirm Booking"}</span>
+          <span>{loading ? "Submitting..." : "Book For A Free Quote"}</span>
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
           </svg>
