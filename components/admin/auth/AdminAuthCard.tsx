@@ -531,8 +531,8 @@ async function handleRegister(e: React.FormEvent) {
         </div>
       </div>
           <div className="text-center mt-5">
-            <p className="text-sm text-gray-600 bg-gray-50">All your data is secure and encrypted</p>
-              <p className="text-center text-gray-600 text-sm mt-2 p-3 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-600 ">All your data is secure and encrypted</p>
+              <p className="text-center text-gray-600 text-sm mt-2 p-3 rounded-lg">
                 Admin-only area. Unauthorized access is prohibited.
               </p>
           </div>
