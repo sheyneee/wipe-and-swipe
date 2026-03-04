@@ -1,24 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import Swal from "sweetalert2";
 import { BRAND } from "@/lib/config/brand";
 
-type Mode = "login" | "register";
-
-type LoginPayload = {
-  email: string;
-  password: string;
-};
-
-type RegisterPayload = {
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  email: string;
-  password: string;
-};
+import AdminAuthShell, { type Mode } from "@/components/admin/auth/AdminAuthShell";
+import AdminLoginForm, { type LoginPayload } from "@/components/admin/auth/AdminLoginForm";
+import AdminRegisterForm, { type RegisterPayload } from "@/components/admin/auth/AdminRegisterForm";
 
 function isNonEmpty(v: string) {
   return v.trim().length > 0;
@@ -140,14 +128,6 @@ export default function AdminAuthCard() {
         });
         return;
       }
-
-      await Swal.fire({
-        icon: "success",
-        title: "Welcome back",
-        text: "Login successful.",
-        confirmButtonColor: BRAND.primary,
-      });
-
       window.location.href = "/admin";
     } catch {
       await Swal.fire({
@@ -357,212 +337,22 @@ async function handleRegister(e: React.FormEvent) {
 }
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      {/* Header OUTSIDE the card */}
-      <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold text-brand-primary mb-2">Welcome</h1>
-        <p className="text-brand-accent text-lg font-semibold">Sign in or create an account</p>
-      </div>
-
-      {/* Main Card */}
-      <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-        {/* Sticky Tab Navigation */}
-        <div className="sticky top-0 z-10 bg-white/95 backdrop-blur flex border-b border-gray-200">
-          <TabNavButton
-            active={mode === "login"}
-            onClick={() => setMode("login")}
-            label="Login"
-          />
-          <TabNavButton
-            active={mode === "register"}
-            onClick={() => setMode("register")}
-            label="Create Account"
-          />
-        </div>
-
-        {/* Body */}
-        <div className="p-8">
-          {mode === "login" ? (
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={login.email}
-                  onChange={(e) => setLogin((p) => ({ ...p, email: e.target.value }))}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none transition-all focus:ring-2"
-                  style={{
-                    borderColor: "rgb(209 213 219)",
-                    boxShadow: "none",
-                  }}
-                  placeholder="your@email.com"
-                  autoComplete="email"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={login.password}
-                  onChange={(e) => setLogin((p) => ({ ...p, password: e.target.value }))}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none transition-all focus:ring-2"
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full py-3 text-white font-semibold rounded-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
-                style={{
-                  background: `linear-gradient(90deg, ${BRAND.primary}, ${BRAND.accent})`,
-                }}
-              >
-                {submitting ? "Signing in..." : "Sign In"}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleRegister} className="space-y-4">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    value={register.firstName}
-                    onChange={(e) =>
-                      setRegister((p) => ({ ...p, firstName: e.target.value }))
-                    }
-                    required
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none transition-all focus:ring-2"
-                    placeholder="John"
-                    autoComplete="given-name"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Minimum 2 characters</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    value={register.lastName}
-                    onChange={(e) =>
-                      setRegister((p) => ({ ...p, lastName: e.target.value }))
-                    }
-                    required
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none transition-all focus:ring-2"
-                    placeholder="Doe"
-                    autoComplete="family-name"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Minimum 2 characters</p>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Middle Name <span className="text-xs text-gray-500">(Optional)</span>
-                </label>
-                <input
-                  type="text"
-                  value={register.middleName ?? ""}
-                  onChange={(e) =>
-                    setRegister((p) => ({ ...p, middleName: e.target.value }))
-                  }
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none transition-all focus:ring-2"
-                  placeholder="Michael"
-                  autoComplete="additional-name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={register.email}
-                  onChange={(e) => setRegister((p) => ({ ...p, email: e.target.value }))}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none transition-all focus:ring-2"
-                  placeholder="your@email.com"
-                  autoComplete="email"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={register.password}
-                  onChange={(e) =>
-                    setRegister((p) => ({ ...p, password: e.target.value }))
-                  }
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none transition-all focus:ring-2"
-                  placeholder="••••••••"
-                  autoComplete="new-password"
-                />
-                <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full py-3 text-white font-semibold rounded-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
-                style={{
-                  background: `linear-gradient(90deg, ${BRAND.primary}, ${BRAND.accent})`,
-                }}
-              >
-                {submitting ? "Creating..." : "Create Account"}
-              </button>
-            </form>
-          )}
-        </div>
-      </div>
-          <div className="text-center mt-5">
-            <p className="text-sm text-gray-600 ">All your data is secure and encrypted</p>
-              <p className="text-center text-gray-600 text-sm mt-2 p-3 rounded-lg">
-                Admin-only area. Unauthorized access is prohibited.
-              </p>
-          </div>
-
-    </div>
-  );
-}
-
-function TabNavButton({
-  active,
-  onClick,
-  label,
-}: {
-  active: boolean;
-  onClick: () => void;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex-1 py-4 text-center font-semibold border-b-2 transition-all hover:bg-gray-50"
-      style={{
-        borderBottomColor: active ? BRAND.primary : "transparent",
-        color: active ? BRAND.primary : "rgb(75 85 99)", // gray-600
-      }}
-    >
-      {label}
-    </button>
+    <AdminAuthShell mode={mode} setMode={setMode}>
+      {mode === "login" ? (
+        <AdminLoginForm
+          value={login}
+          onChange={setLogin}
+          onSubmit={handleLogin}
+          submitting={submitting}
+        />
+      ) : (
+        <AdminRegisterForm
+          value={register}
+          onChange={setRegister}
+          onSubmit={handleRegister}
+          submitting={submitting}
+        />
+      )}
+    </AdminAuthShell>
   );
 }
