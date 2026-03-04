@@ -86,7 +86,7 @@ export const SERVICES: Service[] = [
     emoji: "🧹",
   },
   {
-    value: "deep",
+    value: "deep-cleaning",
     title: "Deep Cleaning",
     price: "$55/hour + Goods and Services Tax",
     description: "Thorough top-to-bottom clean for homes needing extra care. Great before events or seasonal resets.",

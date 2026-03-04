@@ -4,12 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
 
-function scrollToId(id: string) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
 export default function Navbar() {
   const [open, setOpen] = useState(false);
 
@@ -27,34 +21,73 @@ export default function Navbar() {
                 priority
               />
             </div>
-          <div className="leading-tight">
-            <div className="text-2xl font-bold">
-              <span className="text-brand-primary">Wipe</span>
-              <span className="text-brand-secondary"> and </span>
-              <span className="text-brand-accent">Swipe</span>
+
+            <div className="leading-tight">
+              <div className="text-2xl font-bold">
+                <span className="text-brand-primary">Wipe</span>
+                <span className="text-brand-secondary"> and </span>
+                <span className="text-brand-accent">Swipe</span>
+              </div>
+
+              <div className="text-xs md:text-sm font-medium tracking-wide text-gray-500">
+                Cleaning Services Ltd
+              </div>
             </div>
-            <div className="text-xs md:text-sm font-medium tracking-wide text-gray-500">
-              Cleaning Services Ltd
-            </div>
-          </div>
           </Link>
 
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <Link href="/" className="nav-link text-gray-700 font-medium hover:text-brand-primary transition-colors">Home</Link>
-            <Link href="/services" className="nav-link text-gray-700 font-medium hover:text-brand-primary transition-colors">Services</Link>
-             <Link href="/about-us" className="nav-link text-gray-700 font-medium hover:text-[color:var(--color-brand-primary)] transition-colors">
-                About Us
-             </Link>
-             <Link href="/contact" className="nav-link text-gray-700 font-medium hover:text-[color:var(--color-brand-primary)] transition-colors">
-                Contact Us
-             </Link>
-            <Link href="/book-now" className="px-6 py-2.5 bg-gradient-to-r from-brand-primary to-brand-accent text-white font-semibold rounded-full hover:shadow-lg hover:shadow-brand-primary/30 transition-all duration-300 hover:-translate-y-0.5">
+            <Link
+              href="/"
+              className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
+            >
+              Home
+            </Link>
+
+            <Link
+              href="/services"
+              className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
+            >
+              Services
+            </Link>
+
+            <Link
+              href="/about-us"
+              className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
+            >
+              About Us
+            </Link>
+
+            <Link
+              href="/contact"
+              className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
+            >
+              Contact Us
+            </Link>
+
+            <Link
+              href="/book-now"
+              className="px-6 py-2.5 bg-gradient-to-r from-brand-primary to-brand-accent text-white font-semibold rounded-full hover:shadow-lg hover:shadow-brand-primary/30 transition-all duration-300 hover:-translate-y-0.5"
+            >
               Book Now
             </Link>
           </div>
 
-          <button className="md:hidden p-2 text-brand-primary" onClick={() => setOpen(v => !v)} aria-label="Toggle menu">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden p-2 text-brand-primary"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Toggle menu"
+          >
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            >
               <line x1="3" y1="6" x2="21" y2="6" />
               <line x1="3" y1="12" x2="21" y2="12" />
               <line x1="3" y1="18" x2="21" y2="18" />
@@ -62,16 +95,47 @@ export default function Navbar() {
           </button>
         </div>
 
+        {/* Mobile Menu */}
         {open && (
           <div className="md:hidden pt-4 pb-2 border-t mt-4">
             <div className="flex flex-col gap-4">
-              <Link href="/" onClick={() => setOpen(false)} className="text-gray-700 font-medium hover:text-brand-primary">Home</Link>
-              <Link href="/services" onClick={() => setOpen(false)} className="text-gray-700 font-medium hover:text-brand-primary">Services</Link>
-              <Link href="/about-us" className="nav-link text-gray-700 font-medium hover:text-[color:var(--color-brand-primary)] transition-colors">
-                About
+              <Link
+                href="/"
+                onClick={() => setOpen(false)}
+                className="text-gray-700 font-medium hover:text-brand-primary"
+              >
+                Home
               </Link>
-              <Link href="/contact" onClick={() => setOpen(false)} className="text-gray-700 font-medium hover:text-brand-primary">Contact</Link>
-              <Link href="/book-now" onClick={() => setOpen(false)} className="px-6 py-2.5 bg-gradient-to-r from-brand-primary to-brand-accent text-white font-semibold rounded-full text-center">
+
+              <Link
+                href="/services"
+                onClick={() => setOpen(false)}
+                className="text-gray-700 font-medium hover:text-brand-primary"
+              >
+                Services
+              </Link>
+
+              <Link
+                href="/about-us"
+                onClick={() => setOpen(false)}
+                className="text-gray-700 font-medium hover:text-brand-primary"
+              >
+                About Us
+              </Link>
+
+              <Link
+                href="/contact"
+                onClick={() => setOpen(false)}
+                className="text-gray-700 font-medium hover:text-brand-primary"
+              >
+                Contact Us
+              </Link>
+
+              <Link
+                href="/book-now"
+                onClick={() => setOpen(false)}
+                className="px-6 py-2.5 bg-gradient-to-r from-brand-primary to-brand-accent text-white font-semibold rounded-full text-center"
+              >
                 Book Now
               </Link>
             </div>
