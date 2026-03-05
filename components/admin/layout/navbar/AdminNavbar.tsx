@@ -4,59 +4,70 @@ import { cookies } from "next/headers";
 
 export default async function AdminNavbar() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("admin-token");
+  const token = cookieStore.get("admin_token");
 
   if (!token) return null;
 
   return (
-    <nav
-      className="fixed top-0 left-0 right-0 z-50 shadow-sm"
-      style={{ backgroundColor: "#283955" }}
-    >
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        
         {/* Logo */}
         <Link href="/admin" className="flex items-center gap-3">
-          <div className="relative w-10 h-10">
+          <div className="relative w-12 h-12">
             <Image
               src="/wipe-and-swipe-icon.png"
-              alt="Wipe & Swipe"
+              alt="Wipe & Swipe Logo"
               fill
               className="object-contain"
             />
           </div>
 
           <div className="leading-tight">
-            <div className="text-white font-bold text-lg">
-              Admin Dashboard
+            <div className="text-lg font-bold">
+              <span className="text-brand-primary">Admin</span>
+              <span className="text-brand-secondary"> Dashboard</span>
             </div>
-            <div className="text-xs text-gray-300">
+
+            <div className="text-xs md:text-sm font-medium tracking-wide text-gray-500">
               Wipe & Swipe Cleaning Services
             </div>
           </div>
         </Link>
 
         {/* Navigation */}
-        <div className="flex items-center gap-8 text-white font-medium">
-          <Link href="/admin" className="hover:text-[#296276]">
+        <div className="flex items-center gap-8">
+          <Link
+            href="/admin"
+            className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
+          >
             Dashboard
           </Link>
 
-          <Link href="/admin/bookings" className="hover:text-[#296276]">
+          <Link
+            href="/admin/bookings"
+            className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
+          >
             Bookings
           </Link>
 
-          <Link href="/admin/users" className="hover:text-[#296276]">
+          <Link
+            href="/admin/users"
+            className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
+          >
             Users
           </Link>
 
-          <Link href="/admin/settings" className="hover:text-[#296276]">
+          <Link
+            href="/admin/settings"
+            className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
+          >
             Settings
           </Link>
 
           <Link
             href="/api/admin/logout"
-            className="px-4 py-2 rounded-md"
-            style={{ backgroundColor: "#296276" }}
+            className="px-5 py-2.5 bg-gradient-to-r from-brand-primary to-brand-accent text-white font-semibold rounded-full hover:shadow-lg hover:shadow-brand-primary/30 transition-all duration-300 hover:-translate-y-0.5"
           >
             Logout
           </Link>
