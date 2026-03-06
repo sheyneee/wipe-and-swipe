@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+function getAdminBaseUrl(req: NextRequest) {
+  const url = new URL(req.url);
+  const isLocal = url.hostname === "localhost" || url.hostname === "admin.localhost";
+
+  if (isLocal) {
+    return "http://admin.localhost:3000";
+  }
+
+  return `${url.protocol}//admin.wipeandswipe.co.nz`;
+}
+
 export async function GET(req: NextRequest) {
-  const url = new URL("/admin/login", req.url);
-  const response = NextResponse.redirect(url);
+  const adminBaseUrl = getAdminBaseUrl(req);
+  const response = NextResponse.redirect(new URL("/admin/login", adminBaseUrl));
 
   response.cookies.set({
     name: "admin_token",
