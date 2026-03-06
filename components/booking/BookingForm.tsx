@@ -9,9 +9,10 @@ type FormState = {
   email: string;
   phoneNumber: string;
   serviceType: string;
+  otherServiceType: string;
   serviceAddress?: string;
-  preferredDate: string; // yyyy-mm-dd
-  preferredTime: string; // hh:mm
+  preferredDate: string;
+  preferredTime: string;
   specialRequests?: string;
 };
 
@@ -58,6 +59,7 @@ export default function BookingForm() {
     email: "",
     phoneNumber: "",
     serviceType: "",
+    otherServiceType: "",
     serviceAddress: "",
     preferredDate: "",
     preferredTime: "",
@@ -69,47 +71,80 @@ export default function BookingForm() {
   const [errorMsg, setErrorMsg] = useState<string>("");
   const { min, max } = getDateLimits();
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const onChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+
+    setForm((prev) => {
+      if (name === "serviceType") {
+        return {
+          ...prev,
+          serviceType: value,
+          otherServiceType: value === "others" ? prev.otherServiceType : "",
+        };
+      }
+
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
   };
 
- async function onSubmit(e: React.FormEvent) {
-  e.preventDefault();
-  setLoading(true);
-  setErrorMsg("");
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg("");
 
-  try {
-    const isoDate = new Date(form.preferredDate).toISOString();
+    try {
+      if (!isDateWithinNextYear(form.preferredDate)) {
+        throw new Error("Preferred date must be within today and the next 12 months.");
+      }
 
-    const selectedService = SERVICES.find(
-      (service) => service.value === form.serviceType
-    );
+      const isoDate = new Date(`${form.preferredDate}T00:00:00`).toISOString();
 
-    const res = await fetch("/api/bookings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fullName: form.fullName,
-        email: form.email,
-        phoneNumber: form.phoneNumber,
-        serviceType: selectedService?.title || form.serviceType,
-        serviceAddress: form.serviceAddress || undefined,
-        preferredDate: isoDate,
-        preferredTime: form.preferredTime,
-        specialRequests: form.specialRequests || undefined,
-      }),
-    });
+      const finalServiceType =
+        form.serviceType === "others"
+          ? form.otherServiceType.trim()
+          : SERVICES.find((service) => service.value === form.serviceType)?.title || form.serviceType;
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.message || "Booking failed");
+      if (!finalServiceType) {
+        throw new Error("Please select a service type.");
+      }
 
-    setSuccess(true);
-  } catch (err) {
-    setErrorMsg(err instanceof Error ? err.message : "Booking failed");
-  } finally {
-    setLoading(false);
+      if (form.serviceType === "others" && !form.otherServiceType.trim()) {
+        throw new Error("Please enter your service type.");
+      }
+
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: form.fullName,
+          email: form.email,
+          phoneNumber: form.phoneNumber,
+          serviceType: finalServiceType,
+          serviceAddress: form.serviceAddress || undefined,
+          preferredDate: isoDate,
+          preferredTime: form.preferredTime,
+          specialRequests: form.specialRequests || undefined,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Booking failed");
+      }
+
+      setSuccess(true);
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Booking failed");
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
   if (success) {
     return (
@@ -119,14 +154,18 @@ export default function BookingForm() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
           </svg>
         </div>
+
         <h3 className="text-2xl font-bold text-gray-800 mb-2">Booking Submitted!</h3>
-        <p className="text-gray-600 mb-4">Thank you for booking with Wipe &amp; Swipe. We’ll contact you to confirm the details.</p>
-      <Link
-        href="/"
-        className="inline-flex items-center gap-2 px-6 py-3 bg-brand-primary text-white font-semibold rounded-full hover:bg-brand-secondary transition-colors"
-      >
-        Return to Home
-      </Link>
+        <p className="text-gray-600 mb-4">
+          Thank you for booking with Wipe &amp; Swipe. We’ll contact you to confirm the details.
+        </p>
+
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-brand-primary text-white font-semibold rounded-full hover:bg-brand-secondary transition-colors"
+        >
+          Return to Home
+        </Link>
       </div>
     );
   }
@@ -135,30 +174,51 @@ export default function BookingForm() {
     <form onSubmit={onSubmit} className="space-y-8">
       <div>
         <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-          <span className="w-8 h-8 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-semibold">1</span>
+          <span className="w-8 h-8 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-semibold">
+            1
+          </span>
           Personal Information
         </h3>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name <span className="text-red-500">*</span></label>
-            <input name="fullName" value={form.fullName} onChange={onChange} required
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Full Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="fullName"
+              value={form.fullName}
+              onChange={onChange}
+              required
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all"
               placeholder="Enter your full name"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address <span className="text-red-500">*</span></label>
-            <input name="email" type="email" value={form.email} onChange={onChange} required
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Email Address <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={onChange}
+              required
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all"
               placeholder="your@email.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number <span className="text-red-500">*</span></label>
-            <input name="phoneNumber" value={form.phoneNumber} onChange={onChange} required
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Phone Number <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="phoneNumber"
+              value={form.phoneNumber}
+              onChange={onChange}
+              required
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all"
               placeholder="(555) 123-4567"
             />
@@ -168,26 +228,59 @@ export default function BookingForm() {
 
       <div className="border-t pt-8">
         <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-          <span className="w-8 h-8 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-semibold">2</span>
+          <span className="w-8 h-8 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-semibold">
+            2
+          </span>
           Service Details
         </h3>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Service Type <span className="text-red-500">*</span></label>
-            <select name="serviceType" value={form.serviceType} onChange={onChange} required
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Service Type <span className="text-red-500">*</span>
+            </label>
+
+            <select
+              name="serviceType"
+              value={form.serviceType}
+              onChange={onChange}
+              required
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all bg-white"
             >
               <option value="">Select a service</option>
-              {SERVICES.map(s => (
-                <option key={s.value} value={s.value}>{s.title}</option>
+              {SERVICES.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.title}
+                </option>
               ))}
+              <option value="others">Others</option>
             </select>
           </div>
 
+          {form.serviceType === "others" && (
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Please specify service type <span className="text-red-500">*</span>
+              </label>
+              <input
+                name="otherServiceType"
+                value={form.otherServiceType}
+                onChange={onChange}
+                required={form.serviceType === "others"}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all"
+                placeholder="Type your requested service"
+              />
+            </div>
+          )}
+
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Service Address (Optional)</label>
-            <input name="serviceAddress" value={form.serviceAddress} onChange={onChange}
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Service Address (Optional)
+            </label>
+            <input
+              name="serviceAddress"
+              value={form.serviceAddress}
+              onChange={onChange}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all"
               placeholder="123 Main Street, City, ST 12345"
             />
@@ -195,7 +288,9 @@ export default function BookingForm() {
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Preferred Date <span className="text-red-500">*</span></label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Preferred Date <span className="text-red-500">*</span>
+              </label>
               <input
                 name="preferredDate"
                 type="date"
@@ -207,9 +302,17 @@ export default function BookingForm() {
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all"
               />
             </div>
+
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Preferred Time <span className="text-red-500">*</span></label>
-              <input name="preferredTime" type="time" value={form.preferredTime} onChange={onChange} required
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Preferred Time <span className="text-red-500">*</span>
+              </label>
+              <input
+                name="preferredTime"
+                type="time"
+                value={form.preferredTime}
+                onChange={onChange}
+                required
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all"
               />
             </div>
@@ -219,17 +322,27 @@ export default function BookingForm() {
 
       <div className="border-t pt-8">
         <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-          <span className="w-8 h-8 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-semibold">3</span>
+          <span className="w-8 h-8 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-semibold">
+            3
+          </span>
           Additional Information
         </h3>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Special Requests (Optional)</label>
-          <textarea name="specialRequests" value={form.specialRequests} onChange={onChange} rows={4}
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Special Requests (Optional)
+          </label>
+          <textarea
+            name="specialRequests"
+            value={form.specialRequests}
+            onChange={onChange}
+            rows={4}
             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all resize-none"
             placeholder="Tell us about any special requirements or preferences..."
           />
-          <p className="text-sm text-gray-500 mt-2">e.g., Pet allergies, specific areas to avoid, special instructions, etc.</p>
+          <p className="text-sm text-gray-500 mt-2">
+            e.g., Pet allergies, specific areas to avoid, special instructions, etc.
+          </p>
         </div>
       </div>
 

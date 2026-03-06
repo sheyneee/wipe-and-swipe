@@ -69,7 +69,7 @@ export default function Navbar() {
               href="/book-now"
               className="px-6 py-2.5 bg-gradient-to-r from-brand-primary to-brand-accent text-white font-semibold rounded-full hover:shadow-lg hover:shadow-brand-primary/30 transition-all duration-300 hover:-translate-y-0.5"
             >
-              Book Now
+              Free Quote
             </Link>
           </div>
 
@@ -136,7 +136,7 @@ export default function Navbar() {
                 onClick={() => setOpen(false)}
                 className="px-6 py-2.5 bg-gradient-to-r from-brand-primary to-brand-accent text-white font-semibold rounded-full text-center"
               >
-                Book Now
+                Free Quote
               </Link>
             </div>
           </div>
