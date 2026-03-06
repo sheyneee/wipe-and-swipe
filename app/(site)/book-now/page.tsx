@@ -1,5 +1,15 @@
 import Link from "next/link";
 import BookingForm from "@/components/booking/BookingForm";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Request a Free Cleaning Quote",
+  description:
+    "Request a free quote for residential or commercial cleaning services from Wipe & Swipe Cleaning Services Ltd.",
+  alternates: {
+    canonical: "/book-now",
+  },
+};
 
 type BookNowPageProps = {
   searchParams: Promise<{
@@ -22,8 +32,8 @@ export default async function BookNowPage({ searchParams }: BookNowPageProps) {
         </Link>
 
         <div className="mb-8">
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            Request Free Cleaning Quote
+          <h1 className="font-display text-4xl md:text-5xl font-medium text-gray-800 mb-4">
+            Request Free a Cleaning Quote
           </h1>
           <p className="text-gray-600 text-lg">
             Fill out the form below to request a free quote. 
