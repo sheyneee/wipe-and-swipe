@@ -3,6 +3,16 @@ import ServicesHero from "@/components/services/ServicesHero";
 import ServicesGrid from "@/components/services/ServicesGrid";
 import WhyChoose from "@/components/services/WhyChoose";
 import ServicesCta from "@/components/services/ServicesCta";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Professional Cleaning Services",
+  description:
+    "Explore professional residential and commercial cleaning services from Wipe & Swipe Cleaning Services Ltd. Reliable, eco-friendly, and affordable solutions for every space.",
+  alternates: {
+    canonical: "/services",
+  },
+};
 
 export default function ServicesPage() {
   return (
