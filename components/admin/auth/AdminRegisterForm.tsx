@@ -41,23 +41,6 @@ export default function AdminRegisterForm({
           <p className="text-xs text-gray-500 mt-1">Minimum 2 characters</p>
         </div>
 
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Last Name
-          </label>
-          <input
-            type="text"
-            value={value.lastName}
-            onChange={(e) => onChange({ ...value, lastName: e.target.value })}
-            required
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none transition-all focus:ring-2"
-            placeholder="Doe"
-            autoComplete="family-name"
-          />
-          <p className="text-xs text-gray-500 mt-1">Minimum 2 characters</p>
-        </div>
-      </div>
-
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-2">
           Middle Name <span className="text-xs text-gray-500">(Optional)</span>
@@ -70,6 +53,23 @@ export default function AdminRegisterForm({
           placeholder="Michael"
           autoComplete="additional-name"
         />
+      </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          Last Name
+        </label>
+        <input
+          type="text"
+          value={value.lastName}
+          onChange={(e) => onChange({ ...value, lastName: e.target.value })}
+          required
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none transition-all focus:ring-2"
+          placeholder="Doe"
+          autoComplete="family-name"
+        />
+        <p className="text-xs text-gray-500 mt-1">Minimum 2 characters</p>
       </div>
 
       <div>
