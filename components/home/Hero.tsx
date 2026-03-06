@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BubbleBackground from "@/components/home/BubbleBackground";
+import HeroImageCarousel from "./HeroImageCarousel";
 
 export default function Hero() {
   return (
@@ -79,38 +80,7 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="relative animate-slide-right hidden lg:block" style={{ animationDelay: "0.3s" }}>
-          <svg viewBox="0 0 400 400" className="w-full max-w-md mx-auto">
-            <circle cx="200" cy="200" r="180" fill="url(#heroGradient)" opacity="0.3" />
-            <path d="M200 60 L320 140 L320 320 L80 320 L80 140 Z" fill="white" stroke="#296276" strokeWidth="3" />
-            <path d="M200 60 L80 140 L320 140 Z" fill="#296276" />
-            <rect x="120" y="180" width="60" height="60" rx="4" fill="#ccfbf1" stroke="#296276" strokeWidth="2" />
-            <line x1="150" y1="180" x2="150" y2="240" stroke="#296276" strokeWidth="2" />
-            <line x1="120" y1="210" x2="180" y2="210" stroke="#296276" strokeWidth="2" />
-            <rect x="220" y="200" width="60" height="120" rx="4" fill="#296276" />
-            <circle cx="268" cy="265" r="5" fill="#266075" />
-            <g className="animate-sparkle">
-              <path d="M100 100 L105 110 L115 115 L105 120 L100 130 L95 120 L85 115 L95 110 Z" fill="#266075" />
-            </g>
-            <g className="animate-sparkle" style={{ animationDelay: "0.5s" }}>
-              <path d="M300 80 L303 87 L310 90 L303 93 L300 100 L297 93 L290 90 L297 87 Z" fill="#296276" />
-            </g>
-            <g className="animate-sparkle" style={{ animationDelay: "1s" }}>
-              <path d="M340 180 L343 187 L350 190 L343 193 L340 200 L337 193 L330 190 L337 187 Z" fill="#266075" />
-            </g>
-            <circle cx="60" cy="250" r="20" fill="#fcd34d" />
-            <rect x="45" y="270" width="30" height="50" rx="10" fill="#296276" />
-            <line x1="75" y1="290" x2="100" y2="270" stroke="#283955" strokeWidth="4" strokeLinecap="round" />
-            <line x1="100" y1="270" x2="120" y2="340" stroke="#6b7280" strokeWidth="4" strokeLinecap="round" />
-            <ellipse cx="120" cy="345" rx="20" ry="8" fill="#9ca3af" />
-            <defs>
-              <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#296276" />
-                <stop offset="100%" stopColor="#266075" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
+        <HeroImageCarousel />
       </div>
     </section>
   );
