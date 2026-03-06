@@ -16,12 +16,25 @@ export function proxy(req: NextRequest) {
   }
 
   if (isAdminRoute) {
-    // Allow these without session
-    if (pathname === "/admin/login") return NextResponse.next();
-    if (pathname === "/admin/verify-email") return NextResponse.next(); // keep if you have this route
-
-    // Require session cookie
     const token = req.cookies.get("admin_token")?.value;
+
+    // If already logged in, don't allow going back to login
+    if (pathname === "/admin/login") {
+      if (token) {
+        const url = req.nextUrl.clone();
+        url.pathname = "/admin";
+        return NextResponse.redirect(url);
+      }
+
+      return NextResponse.next();
+    }
+
+    // Allow verify-email without session
+    if (pathname === "/admin/verify-email") {
+      return NextResponse.next();
+    }
+
+    // Protect all other admin routes
     if (!token) {
       const url = req.nextUrl.clone();
       url.pathname = "/admin/login";

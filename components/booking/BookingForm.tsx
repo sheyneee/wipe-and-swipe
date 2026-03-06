@@ -15,6 +15,43 @@ type FormState = {
   specialRequests?: string;
 };
 
+function formatLocalDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getDateLimits() {
+  const today = new Date();
+  const minDate = new Date(today);
+  minDate.setHours(0, 0, 0, 0);
+
+  const maxDate = new Date(today);
+  maxDate.setFullYear(maxDate.getFullYear() + 1);
+  maxDate.setHours(0, 0, 0, 0);
+
+  return {
+    min: formatLocalDate(minDate),
+    max: formatLocalDate(maxDate),
+  };
+}
+
+function isDateWithinNextYear(dateString: string) {
+  if (!dateString) return false;
+
+  const selected = new Date(`${dateString}T00:00:00`);
+  if (Number.isNaN(selected.getTime())) return false;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const oneYearFromToday = new Date(today);
+  oneYearFromToday.setFullYear(oneYearFromToday.getFullYear() + 1);
+
+  return selected >= today && selected <= oneYearFromToday;
+}
+
 export default function BookingForm() {
   const [form, setForm] = useState<FormState>({
     fullName: "",
@@ -30,44 +67,49 @@ export default function BookingForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const { min, max } = getDateLimits();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg("");
+ async function onSubmit(e: React.FormEvent) {
+  e.preventDefault();
+  setLoading(true);
+  setErrorMsg("");
 
-    try {
-      const isoDate = new Date(form.preferredDate).toISOString();
+  try {
+    const isoDate = new Date(form.preferredDate).toISOString();
 
-      const res = await fetch("/api/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: form.fullName,
-          email: form.email,
-          phoneNumber: form.phoneNumber,
-          serviceType: form.serviceType,
-          serviceAddress: form.serviceAddress || undefined,
-          preferredDate: isoDate,
-          preferredTime: form.preferredTime,
-          specialRequests: form.specialRequests || undefined,
-        }),
-      });
+    const selectedService = SERVICES.find(
+      (service) => service.value === form.serviceType
+    );
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Booking failed");
+    const res = await fetch("/api/bookings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fullName: form.fullName,
+        email: form.email,
+        phoneNumber: form.phoneNumber,
+        serviceType: selectedService?.title || form.serviceType,
+        serviceAddress: form.serviceAddress || undefined,
+        preferredDate: isoDate,
+        preferredTime: form.preferredTime,
+        specialRequests: form.specialRequests || undefined,
+      }),
+    });
 
-      setSuccess(true);
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Booking failed");
-    } finally {
-      setLoading(false);
-    }
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.message || "Booking failed");
+
+    setSuccess(true);
+  } catch (err) {
+    setErrorMsg(err instanceof Error ? err.message : "Booking failed");
+  } finally {
+    setLoading(false);
   }
+}
 
   if (success) {
     return (
@@ -154,7 +196,14 @@ export default function BookingForm() {
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Preferred Date <span className="text-red-500">*</span></label>
-              <input name="preferredDate" type="date" value={form.preferredDate} onChange={onChange} required
+              <input
+                name="preferredDate"
+                type="date"
+                value={form.preferredDate}
+                onChange={onChange}
+                required
+                min={min}
+                max={max}
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all"
               />
             </div>

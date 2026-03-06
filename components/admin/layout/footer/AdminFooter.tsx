@@ -16,7 +16,7 @@ export default async function AdminFooter() {
           © {new Date().getFullYear()} Wipe & Swipe Cleaning Services Ltd
         </p>
 
-        <p style={{ color: "#296276" }}>
+        <p className="text-gray-300">
           Admin Portal
         </p>
       </div>

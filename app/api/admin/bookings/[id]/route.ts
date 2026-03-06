@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { ok, fail } from "@/lib/http/response";
-import { requireAdmin } from "@/lib/auth/jwt";
+import { requireAdminSession } from "@/lib/auth/admin-session";
 import { handleUpdateBooking } from "@/modules/booking/booking.controller";
 
 type RouteContext = {
@@ -9,7 +9,7 @@ type RouteContext = {
 
 export async function PATCH(request: NextRequest, context: RouteContext) {
   try {
-    requireAdmin(request);
+    await requireAdminSession();
 
     const { id } = await context.params;
     const data = await handleUpdateBooking(request, id);

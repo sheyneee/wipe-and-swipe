@@ -1,10 +1,10 @@
 import { ok, fail } from "@/lib/http/response";
-import { requireAdmin } from "@/lib/auth/jwt";
+import { requireAdminSession } from "@/lib/auth/admin-session";
 import { handleListBookings } from "@/modules/booking/booking.controller";
 
 export async function GET(req: Request) {
   try {
-    requireAdmin(req);
+    await requireAdminSession();
     const data = await handleListBookings(req);
     return ok(data, 200);
   } catch (err) {

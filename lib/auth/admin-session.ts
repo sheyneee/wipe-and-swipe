@@ -1,6 +1,18 @@
 import { cookies } from "next/headers";
+import { verifyAdminToken } from "@/lib/auth/jwt";
+import { HttpError } from "@/lib/http/errors";
 
-export async function hasAdminToken() {
+export async function requireAdminSession() {
   const cookieStore = await cookies();
-  return Boolean(cookieStore.get("admin_token")?.value);
+  const token = cookieStore.get("admin_token")?.value;
+
+  if (!token) {
+    throw new HttpError(401, "Unauthorized");
+  }
+
+  try {
+    return verifyAdminToken(token);
+  } catch {
+    throw new HttpError(401, "Unauthorized");
+  }
 }

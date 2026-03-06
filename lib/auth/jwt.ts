@@ -23,6 +23,25 @@ export function signAdminToken(args: { userId: string; role: AdminRole; status: 
   return jwt.sign(payload, env.JWT_SECRET, { expiresIn: "7d" });
 }
 
+export function verifyAdminToken(token: string): AdminTokenPayload {
+  try {
+    const payload = jwt.verify(token, env.JWT_SECRET) as AdminTokenPayload;
+
+    if (!payload?.userId) {
+      throw new HttpError(403, "Forbidden");
+    }
+
+    if (payload.role !== "ADMIN" && payload.role !== "SUPER_ADMIN") {
+      throw new HttpError(403, "Forbidden");
+    }
+
+    return payload;
+  } catch (error) {
+    if (error instanceof HttpError) throw error;
+    throw new HttpError(401, "Unauthorized");
+  }
+}
+
 function getBearerToken(req: Request) {
   const auth = req.headers.get("authorization") || "";
   const [type, token] = auth.split(" ");
