@@ -5,7 +5,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-start justify-center pt-24 overflow-hidden"
+      className="relative min-h-screen flex items-start justify-center pt-36 overflow-hidden"
     >
       {/* Background image */}
       <div

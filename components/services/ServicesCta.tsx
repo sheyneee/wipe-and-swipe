@@ -4,7 +4,7 @@ export default function ServicesCta({
   title,
   subtitle,
   primaryHref = "/book-now",
-  primaryLabel = "Book Now",
+  primaryLabel = "Book For A Free Quote",
   secondaryHref = "/contact",
   secondaryLabel = "Get in Touch",
 }: {

@@ -205,7 +205,7 @@ export default function AboutPage() {
             href="/book-now"
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[color:var(--color-brand-primary)] to-[color:var(--color-brand-accent)] text-white font-semibold rounded-full hover:shadow-lg hover:shadow-[color:var(--color-brand-primary)]/30 transition-all duration-300 hover:-translate-y-0.5"
           >
-            Book Your Cleaning Today
+            Book Your Free Quote Today
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SERVICES } from "@/lib/data/services";
 import Link from "next/link";
 
@@ -14,6 +14,10 @@ type FormState = {
   preferredDate: string;
   preferredTime: string;
   specialRequests?: string;
+};
+
+type BookingFormProps = {
+  initialService?: string;
 };
 
 function formatLocalDate(date: Date) {
@@ -53,7 +57,7 @@ function isDateWithinNextYear(dateString: string) {
   return selected >= today && selected <= oneYearFromToday;
 }
 
-export default function BookingForm() {
+export default function BookingForm({ initialService = "" }: BookingFormProps) {
   const [form, setForm] = useState<FormState>({
     fullName: "",
     email: "",
@@ -70,6 +74,29 @@ export default function BookingForm() {
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const { min, max } = getDateLimits();
+
+  useEffect(() => {
+    if (!initialService) return;
+
+    const matchedService = SERVICES.find((s) => s.value === initialService);
+
+    if (matchedService) {
+      setForm((prev) => ({
+        ...prev,
+        serviceType: matchedService.value,
+        otherServiceType: "",
+      }));
+      return;
+    }
+
+    if (initialService.trim()) {
+      setForm((prev) => ({
+        ...prev,
+        serviceType: "others",
+        otherServiceType: initialService,
+      }));
+    }
+  }, [initialService]);
 
   const onChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -155,9 +182,9 @@ export default function BookingForm() {
           </svg>
         </div>
 
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">Booking Submitted!</h3>
+        <h3 className="text-2xl font-bold text-gray-800 mb-2">Quote Request Submitted!</h3>
         <p className="text-gray-600 mb-4">
-          Thank you for booking with Wipe &amp; Swipe. We’ll contact you to confirm the details.
+          Thank you for contacting Wipe &amp; Swipe. We’ll review your request and get back to you with a quote.
         </p>
 
         <Link
@@ -358,7 +385,7 @@ export default function BookingForm() {
           disabled={loading}
           className="w-full py-4 bg-gradient-to-r from-brand-primary to-brand-accent text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-brand-primary/30 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:translate-y-0"
         >
-          <span>{loading ? "Submitting..." : "Book For A Free Quote"}</span>
+          <span>{loading ? "Submitting..." : "Request a Free Quote"}</span>
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
           </svg>
