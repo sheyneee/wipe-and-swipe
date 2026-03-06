@@ -1,6 +1,7 @@
 import { dbConnect } from "@/lib/db/mongodb";
 import { Booking } from "@/modules/booking/booking.model";
 import { HttpError } from "@/lib/http/errors";
+import { Resend } from "resend";
 
 type CreateBookingInput = {
   fullName: string;
@@ -13,6 +14,8 @@ type CreateBookingInput = {
   specialRequests?: string;
 };
 
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 export async function createBooking(input: CreateBookingInput) {
   await dbConnect();
 
@@ -22,6 +25,33 @@ export async function createBooking(input: CreateBookingInput) {
     preferredDate: new Date(input.preferredDate),
     status: "PENDING",
   });
+
+  // SEND EMAIL NOTIFICATION
+  try {
+    await resend.emails.send({
+      from: `Wipe & Swipe <${process.env.CONTACT_FROM_EMAIL}>`,
+      to: [process.env.CONTACT_TO_EMAIL!],
+      subject: "New Cleaning Quote Request",
+      html: `
+        <h2>New Quote Request</h2>
+
+        <p><strong>Name:</strong> ${input.fullName}</p>
+        <p><strong>Email:</strong> ${input.email}</p>
+        <p><strong>Phone:</strong> ${input.phoneNumber}</p>
+
+        <p><strong>Service Type:</strong> ${input.serviceType}</p>
+        <p><strong>Service Address:</strong> ${input.serviceAddress || "Not provided"}</p>
+
+        <p><strong>Date:</strong> ${new Date(input.preferredDate).toLocaleDateString()}</p>
+        <p><strong>Time:</strong> ${input.preferredTime}</p>
+
+        <p><strong>Special Requests:</strong></p>
+        <p>${input.specialRequests || "None"}</p>
+      `,
+    });
+  } catch (error) {
+    console.error("Email sending failed:", error);
+  }
 
   return { id: String(booking._id) };
 }
