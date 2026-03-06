@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { cookies } from "next/headers";
+import AdminLogoutButton from "@/components/admin/ui/AdminLogoutButton";
 
 export default async function AdminNavbar() {
   const cookieStore = await cookies();
@@ -65,12 +66,7 @@ export default async function AdminNavbar() {
             Settings
           </Link>
 
-        <a
-          href="/api/admin/logout"
-          className="px-5 py-2.5 bg-gradient-to-r from-brand-primary to-brand-accent text-white font-semibold rounded-full hover:shadow-lg hover:shadow-brand-primary/30 transition-all duration-300 hover:-translate-y-0.5"
-        >
-          Logout
-        </a>
+        <AdminLogoutButton />
         </div>
       </div>
     </nav>
