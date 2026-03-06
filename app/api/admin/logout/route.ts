@@ -13,6 +13,19 @@ export async function GET(req: NextRequest) {
     sameSite: "lax",
     path: "/",
     maxAge: 0,
+    expires: new Date(0),
+  });
+
+  response.cookies.set({
+    name: "admin_token",
+    value: "",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    domain: ".wipeandswipe.co.nz",
+    maxAge: 0,
+    expires: new Date(0),
   });
 
   return response;
