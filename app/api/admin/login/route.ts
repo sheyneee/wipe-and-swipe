@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { loginAdmin } from "@/modules/admin/admin.service";
-import { HttpError } from "@/lib/http/errors";
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
+
   if (!body?.email || !body?.password) {
-    return NextResponse.json({ message: "Email and password are required." }, { status: 400 });
+    return NextResponse.json(
+      { message: "Email and password are required." },
+      { status: 400 }
+    );
   }
 
   try {
@@ -13,30 +16,29 @@ export async function POST(req: Request) {
 
     const res = NextResponse.json({ admin }, { status: 200 });
 
-    // Secure cookie. HttpOnly so JS cannot read it.
     res.cookies.set("admin_token", token, {
       httpOnly: true,
-      secure: true, // in localhost, Next still sets it, but browser may behave depending on scheme
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
+      domain: process.env.COOKIE_DOMAIN || undefined,
     });
 
     return res;
   } catch (error: unknown) {
-  if (error instanceof Error) {
-    const status =
-      (error as { statusCode?: number }).statusCode ?? 500;
+    if (error instanceof Error) {
+      const status = (error as { statusCode?: number }).statusCode ?? 500;
+
+      return NextResponse.json(
+        { message: error.message },
+        { status }
+      );
+    }
 
     return NextResponse.json(
-      { message: error.message },
-      { status }
+      { message: "Login failed." },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json(
-    { message: "Login failed." },
-    { status: 500 }
-  );
-}
 }
