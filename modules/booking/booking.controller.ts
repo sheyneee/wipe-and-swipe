@@ -1,5 +1,10 @@
 import { CreateBookingSchema, UpdateBookingSchema } from "./booking.validator";
-import { createBooking, listBookings, updateBooking } from "./booking.service";
+import {
+  createBooking,
+  listBookings,
+  updateBooking,
+  deleteBooking,
+} from "./booking.service";
 
 export async function handleCreateBooking(req: Request) {
   const body = CreateBookingSchema.parse(await req.json());
@@ -16,4 +21,8 @@ export async function handleUpdateBooking(req: Request, id: string) {
   const json = await req.json();
   const parsed = UpdateBookingSchema.parse(json);
   return updateBooking(id, parsed);
+}
+
+export async function handleDeleteBooking(id: string) {
+  return deleteBooking(id);
 }

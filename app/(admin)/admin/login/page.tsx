@@ -1,9 +1,13 @@
+import { redirect } from "next/navigation";
+import { getAdminSession } from "@/lib/auth/admin-session";
 import AdminAuthCard from "@/components/admin/auth/AdminAuthCard";
 
-export default function AdminLoginPage() {
-  return (
-    <div className="h-full flex items-center justify-center px-6">
-      <AdminAuthCard />
-    </div>
-  );
+export default async function AdminLoginPage() {
+  const session = await getAdminSession();
+
+  if (session) {
+    redirect("/admin");
+  }
+
+  return <AdminAuthCard />;
 }

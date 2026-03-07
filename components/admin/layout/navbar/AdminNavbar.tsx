@@ -1,11 +1,10 @@
-import { cookies } from "next/headers";
-import AdminNavbarClient from "./AdminNavbarBody";
+import { getAdminSession } from "@/lib/auth/admin-session";
+import AdminNavbarBody from "./AdminNavbarBody";
 
 export default async function AdminNavbar() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("admin_token");
+  const session = await getAdminSession();
 
-  if (!token) return null;
+  if (!session) return null;
 
-  return <AdminNavbarClient />;
+  return <AdminNavbarBody />;
 }

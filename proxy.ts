@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifyAdminToken } from "@/lib/auth/jwt";
 
 export function proxy(req: NextRequest) {
   const host = req.headers.get("host") || "";
@@ -8,38 +9,50 @@ export function proxy(req: NextRequest) {
   const isAdminRoute = pathname.startsWith("/admin");
   const isAdminHost = host.startsWith("admin.");
 
-  // Block /admin on main domain
   if (isAdminRoute && !isAdminHost) {
     const url = req.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);
   }
 
-  if (isAdminRoute) {
-    const token = req.cookies.get("admin_token")?.value;
+  if (!isAdminRoute) {
+    return NextResponse.next();
+  }
 
-    // If already logged in, don't allow going back to login
-    if (pathname === "/admin/login") {
-      if (token) {
-        const url = req.nextUrl.clone();
-        url.pathname = "/admin";
-        return NextResponse.redirect(url);
-      }
+  const token = req.cookies.get("admin_token")?.value;
 
-      return NextResponse.next();
+  let hasValidToken = false;
+
+  if (token) {
+    try {
+      verifyAdminToken(token);
+      hasValidToken = true;
+    } catch {
+      hasValidToken = false;
+    }
+  }
+
+  if (pathname === "/admin/login" || pathname === "/admin/verify-email") {
+    return NextResponse.next();
+  }
+
+  if (!hasValidToken) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/admin/login";
+
+    const res = NextResponse.redirect(url);
+
+    if (token) {
+      res.cookies.set("admin_token", "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 0,
+      });
     }
 
-    // Allow verify-email without session
-    if (pathname === "/admin/verify-email") {
-      return NextResponse.next();
-    }
-
-    // Protect all other admin routes
-    if (!token) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/admin/login";
-      return NextResponse.redirect(url);
-    }
+    return res;
   }
 
   return NextResponse.next();

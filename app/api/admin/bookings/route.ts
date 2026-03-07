@@ -4,7 +4,7 @@ import { handleListBookings } from "@/modules/booking/booking.controller";
 
 export async function GET(req: Request) {
   try {
-    await requireAdminSession();
+    await requireAdminSession({ redirectToLogin: false });
     const data = await handleListBookings(req);
     return ok(data, 200);
   } catch (err) {

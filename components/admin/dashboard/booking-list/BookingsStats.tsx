@@ -5,7 +5,8 @@ type BookingStatus =
   | "CONFIRMED"
   | "DECLINED"
   | "CANCELLED"
-  | "COMPLETED";
+  | "COMPLETED"
+  | "ARCHIVED";
 
 type Booking = {
   status: BookingStatus;
@@ -18,7 +19,7 @@ export default function BookingsStats({ bookings }: { bookings: Booking[] }) {
   const completed = bookings.filter((b) => b.status === "COMPLETED").length;
 
   return (
-    <div className="grid md:grid-cols-4 gap-6 mb-8">
+    <div className="grid md:grid-cols-4 gap-6">
       <StatCard
         title="Total Bookings"
         value={total}
