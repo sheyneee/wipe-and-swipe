@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BubbleBackground from "@/components/client/home/BubbleBackground";
+import HeroBackgroundCarousel from "@/components/client/home/HeroBackgroundCarousel";
 
 export default function Hero() {
   return (
@@ -8,12 +9,7 @@ export default function Hero() {
       className="relative min-h-screen flex items-start justify-center pt-36 overflow-hidden"
     >
       {/* Background image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60"
-        style={{
-          backgroundImage: "url('/images/hero/team-cleaning-room.jpg')",
-        }}
-      />
+      <HeroBackgroundCarousel />
 
       <div className="absolute inset-0 bg-white/50" />
 
