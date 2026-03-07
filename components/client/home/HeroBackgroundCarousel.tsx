@@ -17,7 +17,7 @@ export default function HeroBackgroundCarousel() {
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % images.length);
-    }, 5000); // 5 seconds
+    }, 2000); // 2 seconds
 
     return () => clearInterval(interval);
   }, []);

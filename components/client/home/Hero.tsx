@@ -14,9 +14,9 @@ export default function Hero() {
       <div className="absolute inset-0 bg-white/50" />
 
       {/* Bubble background */}
-      <div className="absolute inset-0 z-[1]">
+      {/* <div className="absolute inset-0 z-[1]">
         <BubbleBackground />
-      </div>
+      </div> */}
 
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 py-12 text-center animate-slide-up">
