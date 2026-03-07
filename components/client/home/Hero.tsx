@@ -1,5 +1,5 @@
 import Link from "next/link";
-import BubbleBackground from "@/components/home/BubbleBackground";
+import BubbleBackground from "@/components/client/home/BubbleBackground";
 
 export default function Hero() {
   return (

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SERVICES } from "@/lib/data/services";
-import BackButton from "@/components/ui/BackButton";
+import BackButton from "@/components/client/ui/BackButton";
 
 type PageProps = {
   params: Promise<{ value: string }>;

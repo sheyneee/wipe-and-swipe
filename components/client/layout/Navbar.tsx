@@ -25,7 +25,7 @@ export default function Navbar() {
             <div className="leading-tight">
               <div className="text-2xl font-bold">
                 <span className="text-brand-primary">Wipe</span>
-                <span className="text-brand-secondary"> and </span>
+                <span className="text-brand-primary"> and </span>
                 <span className="text-brand-accent">Swipe</span>
               </div>
 

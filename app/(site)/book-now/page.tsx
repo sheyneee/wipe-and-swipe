@@ -1,5 +1,5 @@
 import Link from "next/link";
-import BookingForm from "@/components/booking/BookingForm";
+import BookingForm from "@/components/client/booking/BookingForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

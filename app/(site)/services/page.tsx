@@ -1,8 +1,8 @@
 import { SERVICES } from "@/lib/data/services";
-import ServicesHero from "@/components/services/ServicesHero";
-import ServicesGrid from "@/components/services/ServicesGrid";
-import WhyChoose from "@/components/services/WhyChoose";
-import ServicesCta from "@/components/services/ServicesCta";
+import ServicesHero from "@/components/client/services/ServicesHero";
+import ServicesGrid from "@/components/client/services/ServicesGrid";
+import WhyChoose from "@/components/client/services/WhyChoose";
+import ServicesCta from "@/components/client/services/ServicesCta";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

@@ -31,7 +31,7 @@ export default function AdminNavbarBody() {
             <div className="leading-tight min-w-0">
               <div className="text-base sm:text-lg font-bold truncate">
                 <span className="text-brand-primary">Admin</span>
-                <span className="text-brand-secondary"> Dashboard</span>
+                <span className="text-brand-primary"> Dashboard</span>
               </div>
 
               <div className="text-[10px] sm:text-xs md:text-sm font-medium tracking-wide text-gray-500 truncate">

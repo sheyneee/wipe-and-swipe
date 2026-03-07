@@ -1,7 +1,7 @@
-import Hero from "@/components/home/Hero";
-import ServicesGrid from "@/components/home/ServicesGrid";
-import HomeContactSection from "@/components/home/HomeContactSection";
-import MeetTheTeam from "@/components/home/MeetTheTeam";
+import Hero from "@/components/client/home/Hero";
+import ServicesGrid from "@/components/client/home/ServicesGrid";
+import HomeContactSection from "@/components/client/home/HomeContactSection";
+import MeetTheTeam from "@/components/client/home/MeetTheTeam";
 
 export default function HomePage() {
   return (
