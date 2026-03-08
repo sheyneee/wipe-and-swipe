@@ -5,8 +5,14 @@ import Image from "next/image";
 import { useState } from "react";
 import AdminLogoutButton from "@/components/admin/ui/AdminLogoutButton";
 
-export default function AdminNavbarBody() {
+
+type Props = {
+  role: "SUPER_ADMIN" | "ADMIN";
+};
+
+export default function AdminNavbarBody({ role }: Props) {
   const [open, setOpen] = useState(false);
+  
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">
@@ -49,19 +55,23 @@ export default function AdminNavbarBody() {
               Dashboard
             </Link>
 
-            <Link
-              href="/admin/bookings"
-              className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
-            >
-              Edit History
-            </Link>
+            {role === "SUPER_ADMIN" && (
+              <Link
+                href="/admin/bookings"
+                className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
+              >
+                Edit History
+              </Link>
+            )}
 
-            <Link
-              href="/admin/users"
-              className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
-            >
-              Users
-            </Link>
+            {role === "SUPER_ADMIN" && (
+              <Link
+                href="/admin/users"
+                className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
+              >
+                Users
+              </Link>
+            )}
 
             <Link
               href="/admin/settings"
@@ -110,21 +120,25 @@ export default function AdminNavbarBody() {
                 Dashboard
               </Link>
 
-              <Link
-                href="/admin/bookings"
-                onClick={() => setOpen(false)}
-                className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
-              >
-                Edit History
-              </Link>
+              {role === "SUPER_ADMIN" && (
+                <Link
+                  href="/admin/bookings"
+                  onClick={() => setOpen(false)}
+                  className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
+                >
+                  Edit History
+                </Link>
+              )}
 
-              <Link
-                href="/admin/users"
-                onClick={() => setOpen(false)}
-                className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
-              >
-                Users
-              </Link>
+              {role === "SUPER_ADMIN" && (
+                <Link
+                  href="/admin/users"
+                  onClick={() => setOpen(false)}
+                  className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
+                >
+                  Users
+                </Link>
+              )}
 
               <Link
                 href="/admin/settings"

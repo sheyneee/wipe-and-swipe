@@ -12,11 +12,10 @@ type RouteContext = {
 
 export async function PATCH(request: NextRequest, context: RouteContext) {
   try {
-    await requireAdminSession({ redirectToLogin: false });
-
+    const session = await requireAdminSession({ redirectToLogin: false });
     const { id } = await context.params;
-    const data = await handleUpdateBooking(request, id);
 
+    const data = await handleUpdateBooking(request, id, session);
     return ok(data, 200);
   } catch (err) {
     return fail(err);
@@ -25,11 +24,10 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
 export async function DELETE(_request: NextRequest, context: RouteContext) {
   try {
-    await requireAdminSession({ redirectToLogin: false });
-
+    const session = await requireAdminSession({ redirectToLogin: false });
     const { id } = await context.params;
-    const data = await handleDeleteBooking(id);
 
+    const data = await handleDeleteBooking(id, session);
     return ok(data, 200);
   } catch (err) {
     return fail(err);

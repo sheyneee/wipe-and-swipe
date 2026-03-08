@@ -2,6 +2,7 @@ import { dbConnect } from "@/lib/db/mongodb";
 import { Booking } from "@/modules/booking/booking.model";
 import { HttpError } from "@/lib/http/errors";
 import { Resend } from "resend";
+import { createBookingHistory } from "@/modules/booking-history/booking-history.service";
 import mongoose from "mongoose";
 
 type CreateBookingInput = {
@@ -27,6 +28,46 @@ type UpdateBookingInput = {
   status?: "PENDING" | "CONFIRMED" | "DECLINED" | "CANCELLED" | "COMPLETED" | "ARCHIVED";
   price?: number | null;
 };
+
+type AdminActor = {
+  userId: string;
+  role: "SUPER_ADMIN" | "ADMIN";
+  status: "PENDING" | "ACTIVE" | "SUSPENDED";
+};
+
+function normalizeValue(value: unknown) {
+  if (value instanceof Date) return value.toISOString();
+  if (value === undefined) return null;
+  return value;
+}
+
+function getChangedFields(
+  original: Record<string, unknown>,
+  updated: Record<string, unknown>
+) {
+  const changes: Array<{
+    field: string;
+    oldValue: unknown;
+    newValue: unknown;
+  }> = [];
+
+  for (const [key, newValue] of Object.entries(updated)) {
+    const oldValue = original[key];
+
+    if (
+      JSON.stringify(normalizeValue(oldValue)) !==
+      JSON.stringify(normalizeValue(newValue))
+    ) {
+      changes.push({
+        field: key,
+        oldValue: oldValue ?? null,
+        newValue: newValue ?? null,
+      });
+    }
+  }
+
+  return changes;
+}
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -75,11 +116,21 @@ export async function listBookings(status?: string) {
   return Booking.find(query).sort({ createdAt: -1 }).lean();
 }
 
-export async function updateBooking(id: string, patch: UpdateBookingInput) {
+export async function updateBooking(
+  id: string,
+  patch: UpdateBookingInput,
+  actor: AdminActor
+) {
   await dbConnect();
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new HttpError(400, "Invalid booking id");
+  }
+
+  const existing = await Booking.findById(id).lean();
+
+  if (!existing) {
+    throw new HttpError(404, "Booking not found");
   }
 
   const updatePayload: Record<string, unknown> = {};
@@ -99,22 +150,50 @@ export async function updateBooking(id: string, patch: UpdateBookingInput) {
     updatePayload.archivedAt = patch.status === "ARCHIVED" ? new Date() : null;
   }
 
-  const updated = await Booking.findByIdAndUpdate(
+  const changes = getChangedFields(existing as Record<string, unknown>, updatePayload);
+
+  const updatedBooking = await Booking.findByIdAndUpdate(
     id,
     { $set: updatePayload },
     { new: true, runValidators: true }
   ).lean();
 
-  if (!updated) throw new HttpError(404, "Booking not found");
+  if (!updatedBooking) {
+    throw new HttpError(404, "Booking not found");
+  }
 
-  return updated;
+  if (changes.length > 0) {
+    const isArchive = changes.some(
+      (change) => change.field === "status" && change.newValue === "ARCHIVED"
+    );
+
+    const hasStatusChange = changes.some((change) => change.field === "status");
+
+    await createBookingHistory({
+      bookingId: id,
+      action: isArchive ? "ARCHIVE" : hasStatusChange ? "STATUS_CHANGE" : "UPDATE",
+      actor,
+      changes,
+    });
+  }
+
+  return updatedBooking;
 }
 
-export async function deleteBooking(id: string) {
+export async function deleteBooking(
+  id: string,
+  actor: AdminActor
+) {
   await dbConnect();
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new HttpError(400, "Invalid booking id");
+  }
+
+  const existing = await Booking.findById(id).lean();
+
+  if (!existing) {
+    throw new HttpError(404, "Booking not found");
   }
 
   const deleted = await Booking.findByIdAndDelete(id).lean();
@@ -122,6 +201,14 @@ export async function deleteBooking(id: string) {
   if (!deleted) {
     throw new HttpError(404, "Booking not found");
   }
+
+  await createBookingHistory({
+    bookingId: id,
+    action: "DELETE",
+    actor,
+    changes: [],
+    note: `Deleted booking for ${existing.fullName}`,
+  });
 
   return {
     success: true,

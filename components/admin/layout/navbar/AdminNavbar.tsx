@@ -6,5 +6,5 @@ export default async function AdminNavbar() {
 
   if (!session) return null;
 
-  return <AdminNavbarBody />;
+  return <AdminNavbarBody role={session.role} />;
 }
