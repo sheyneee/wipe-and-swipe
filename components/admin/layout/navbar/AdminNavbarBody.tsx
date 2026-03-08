@@ -53,7 +53,7 @@ export default function AdminNavbarBody() {
               href="/admin/bookings"
               className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
             >
-              Bookings
+              Edit History
             </Link>
 
             <Link
@@ -115,7 +115,7 @@ export default function AdminNavbarBody() {
                 onClick={() => setOpen(false)}
                 className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
               >
-                Bookings
+                Edit History
               </Link>
 
               <Link
