@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import type { Booking } from "../BookingsTable";
 import EditBookingForm, { type UpdateBookingPayload } from "./EditBookingForm";
@@ -8,6 +8,7 @@ import EditBookingForm, { type UpdateBookingPayload } from "./EditBookingForm";
 type Props = {
   open: boolean;
   booking: Booking | null;
+  initialMode?: "view" | "edit";
   onClose: () => void;
   onSave: (id: string, payload: UpdateBookingPayload) => Promise<void>;
 };
@@ -15,11 +16,18 @@ type Props = {
 export default function ViewBookingModal({
   open,
   booking,
+  initialMode = "view",
   onClose,
   onSave,
 }: Props) {
-  const [mode, setMode] = useState<"view" | "edit">("view");
+  const [mode, setMode] = useState<"view" | "edit">(initialMode);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setMode(initialMode);
+    }
+  }, [open, initialMode, booking?._id]);
 
   if (!open || !booking) return null;
 
@@ -104,10 +112,7 @@ export default function ViewBookingModal({
                 />
                 <Detail label="Status" value={currentBooking.status} />
                 <div className="md:col-span-2">
-                  <Detail
-                    label="Special Requests"
-                    value={currentBooking.specialRequests}
-                  />
+                  <Detail label="Special Requests" value={currentBooking.specialRequests} />
                 </div>
               </div>
 
@@ -123,6 +128,7 @@ export default function ViewBookingModal({
             </>
           ) : (
             <EditBookingForm
+              key={currentBooking._id}
               booking={currentBooking}
               saving={saving}
               onCancel={() => setMode("view")}

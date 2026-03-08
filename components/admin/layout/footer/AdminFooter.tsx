@@ -10,7 +10,7 @@ export default async function AdminFooter() {
       className="mt-20 py-6 border-t border-white/10"
       style={{ backgroundColor: "#283955" }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="w-full px-6 lg:px-12 xl:px-20">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <p className="text-xs sm:text-sm text-gray-300">
             © {new Date().getFullYear()} Wipe & Swipe Cleaning Services Ltd

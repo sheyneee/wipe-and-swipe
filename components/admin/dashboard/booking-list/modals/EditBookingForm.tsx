@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { SERVICES } from "@/lib/data/services";
 import type { Booking, BookingStatus } from "../BookingsTable";
 
 export type UpdateBookingPayload = {
@@ -36,11 +37,54 @@ type FormState = {
   status: BookingStatus;
 };
 
+const CUSTOM_SERVICE_VALUE = "__custom__";
+
 function toDateInputValue(value?: string) {
   if (!value) return "";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return date.toISOString().split("T")[0];
+}
+
+function toTimeInputValue(value?: string) {
+  if (!value) return "";
+
+  const trimmed = value.trim();
+
+  if (/^\d{2}:\d{2}$/.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (/^\d{2}:\d{2}:\d{2}$/.test(trimmed)) {
+    return trimmed.slice(0, 5);
+  }
+
+  const match = trimmed.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (match) {
+    let hours = Number(match[1]);
+    const minutes = match[2];
+    const period = match[3].toUpperCase();
+
+    if (period === "AM" && hours === 12) hours = 0;
+    if (period === "PM" && hours !== 12) hours += 12;
+
+    return `${String(hours).padStart(2, "0")}:${minutes}`;
+  }
+
+  return "";
+}
+
+function normalizeText(value: string) {
+  return value.trim().toLowerCase();
+}
+
+const SERVICE_TITLES = SERVICES.map((service) => service.title);
+
+function isStandardService(serviceType?: string) {
+  if (!serviceType) return false;
+
+  const normalized = normalizeText(serviceType);
+  return SERVICE_TITLES.some((title) => normalizeText(title) === normalized);
 }
 
 function createInitialFormState(booking: Booking): FormState {
@@ -51,7 +95,7 @@ function createInitialFormState(booking: Booking): FormState {
     serviceType: booking.serviceType ?? "",
     serviceAddress: booking.serviceAddress ?? "",
     preferredDate: toDateInputValue(booking.preferredDate),
-    preferredTime: booking.preferredTime ?? "",
+    preferredTime: toTimeInputValue(booking.preferredTime),
     specialRequests: booking.specialRequests ?? "",
     price:
       booking.price === null || booking.price === undefined
@@ -67,10 +111,39 @@ export default function EditBookingForm({
   onCancel,
   onSave,
 }: Props) {
-  const [form, setForm] = useState<FormState>(() => createInitialFormState(booking));
+  const [form, setForm] = useState<FormState>(() =>
+    createInitialFormState(booking)
+  );
+
+  const [serviceMode, setServiceMode] = useState<"select" | "custom">(
+    isStandardService(booking.serviceType) ? "select" : "custom"
+  );
+
+  const selectedServiceValue = useMemo(() => {
+    if (serviceMode === "custom") return CUSTOM_SERVICE_VALUE;
+
+    const matched = SERVICE_TITLES.find(
+      (title) => normalizeText(title) === normalizeText(form.serviceType)
+    );
+
+    return matched ?? "";
+  }, [form.serviceType, serviceMode]);
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function handleServiceSelectChange(value: string) {
+    if (value === CUSTOM_SERVICE_VALUE) {
+      setServiceMode("custom");
+      if (isStandardService(form.serviceType)) {
+        updateField("serviceType", "");
+      }
+      return;
+    }
+
+    setServiceMode("select");
+    updateField("serviceType", value);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -83,7 +156,7 @@ export default function EditBookingForm({
       serviceType: form.serviceType.trim(),
       serviceAddress: form.serviceAddress.trim() || undefined,
       preferredDate: form.preferredDate,
-      preferredTime: form.preferredTime.trim(),
+      preferredTime: form.preferredTime.trim() || undefined,
       specialRequests: form.specialRequests.trim() || undefined,
       price: form.price.trim() === "" ? null : Number(form.price),
       status: form.status,
@@ -119,11 +192,30 @@ export default function EditBookingForm({
         </Field>
 
         <Field label="Service Type">
-          <input
-            value={form.serviceType}
-            onChange={(e) => updateField("serviceType", e.target.value)}
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:ring-2 focus:ring-brand-primary"
-          />
+          <div className="space-y-3">
+            <select
+              value={selectedServiceValue}
+              onChange={(e) => handleServiceSelectChange(e.target.value)}
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:ring-2 focus:ring-brand-primary"
+            >
+              <option value="">Select a service</option>
+              {SERVICES.map((service) => (
+                <option key={service.value} value={service.title}>
+                  {service.title}
+                </option>
+              ))}
+              <option value={CUSTOM_SERVICE_VALUE}>Other / Custom</option>
+            </select>
+
+            {serviceMode === "custom" && (
+              <input
+                value={form.serviceType}
+                onChange={(e) => updateField("serviceType", e.target.value)}
+                placeholder="Type custom service"
+                className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:ring-2 focus:ring-brand-primary"
+              />
+            )}
+          </div>
         </Field>
 
         <Field label="Service Address">
@@ -156,6 +248,7 @@ export default function EditBookingForm({
 
         <Field label="Preferred Time">
           <input
+            type="time"
             value={form.preferredTime}
             onChange={(e) => updateField("preferredTime", e.target.value)}
             className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:ring-2 focus:ring-brand-primary"
@@ -166,7 +259,9 @@ export default function EditBookingForm({
           <Field label="Status">
             <select
               value={form.status}
-              onChange={(e) => updateField("status", e.target.value as BookingStatus)}
+              onChange={(e) =>
+                updateField("status", e.target.value as BookingStatus)
+              }
               className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:ring-2 focus:ring-brand-primary"
             >
               <option value="PENDING">Pending</option>

@@ -19,7 +19,7 @@ export default function BookingsStats({ bookings }: { bookings: Booking[] }) {
   const completed = bookings.filter((b) => b.status === "COMPLETED").length;
 
   return (
-    <div className="grid md:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
       <StatCard
         title="Total Bookings"
         value={total}
@@ -57,8 +57,12 @@ export default function BookingsStats({ bookings }: { bookings: Booking[] }) {
         icon={
           <svg
             className="w-12 h-12 text-green-500/20"
-            fill="currentColor"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
             <path d="M5 13l4 4L19 7" />
           </svg>
@@ -72,8 +76,12 @@ export default function BookingsStats({ bookings }: { bookings: Booking[] }) {
         icon={
           <svg
             className="w-12 h-12 text-blue-500/20"
-            fill="currentColor"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
             <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>

@@ -10,8 +10,8 @@ export default function AdminNavbarBody() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-        <div className="flex items-center justify-between gap-4">
+      <div className="w-full px-6 lg:px-12 xl:px-20 py-4">
+        <div className="flex items-center justify-between gap-6">
           {/* Logo */}
           <Link
             href="/admin"
@@ -41,7 +41,7 @@ export default function AdminNavbarBody() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6 lg:gap-8">
+          <div className="hidden md:flex items-center gap-8 xl:gap-10">
             <Link
               href="/admin"
               className="text-gray-700 font-medium hover:text-brand-primary transition-colors"

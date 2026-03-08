@@ -311,8 +311,19 @@ export default function BookingForm({ initialService = "" }: BookingFormProps) {
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all"
               placeholder="123 Main Street, City, ST 12345"
             />
-          </div>
+          </div>       
+        </div>
+      </div>
 
+      <div className="border-t pt-8">
+        <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+          <span className="w-8 h-8 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-semibold">
+            3
+          </span>
+          Schedule Appointment
+        </h3>
+
+        <div className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -350,7 +361,7 @@ export default function BookingForm({ initialService = "" }: BookingFormProps) {
       <div className="border-t pt-8">
         <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
           <span className="w-8 h-8 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-semibold">
-            3
+            4
           </span>
           Additional Information
         </h3>
@@ -368,7 +379,7 @@ export default function BookingForm({ initialService = "" }: BookingFormProps) {
             placeholder="Tell us about any special requirements or preferences..."
           />
           <p className="text-sm text-gray-500 mt-2">
-            e.g., Pet allergies, specific areas to avoid, special instructions, etc.
+            e.g., Any requests, notes, specific areas to avoid, special instructions, etc.
           </p>
         </div>
       </div>

@@ -16,29 +16,30 @@ export default function BookingsContainer() {
   const [loading, setLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<"view" | "edit">("view");
 
   useEffect(() => {
     void fetchBookings();
   }, []);
 
   async function forceLogoutAndRedirect(
-  message = "Your admin session is no longer active."
-) {
-  try {
-    await fetch("/api/admin/logout", {
-      method: "POST",
-      credentials: "include",
+    message = "Your admin session is no longer active."
+  ) {
+    try {
+      await fetch("/api/admin/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch {}
+
+    await Swal.fire({
+      icon: "warning",
+      title: "Session ended",
+      text: message,
     });
-  } catch {}
 
-  await Swal.fire({
-    icon: "warning",
-    title: "Session ended",
-    text: message,
-  });
-
-  window.location.href = "/admin/login";
-}
+    window.location.href = "/admin/login";
+  }
 
   async function fetchBookings() {
     try {
@@ -48,6 +49,11 @@ export default function BookingsContainer() {
         method: "GET",
         credentials: "include",
       });
+
+      if (res.status === 401 || res.status === 403) {
+        await forceLogoutAndRedirect();
+        return;
+      }
 
       if (!res.ok) throw new Error("Failed to load bookings");
 
@@ -86,6 +92,12 @@ export default function BookingsContainer() {
         body: JSON.stringify({ status }),
       });
 
+      if (res.status === 401 || res.status === 403) {
+        setBookings(previousBookings);
+        await forceLogoutAndRedirect();
+        return;
+      }
+
       if (!res.ok) throw new Error("Failed to update status");
     } catch (error) {
       console.error("handleStatusChange error:", error);
@@ -96,11 +108,19 @@ export default function BookingsContainer() {
 
   function handleOpenView(booking: Booking) {
     setSelectedBooking(booking);
+    setModalMode("view");
+    setIsViewModalOpen(true);
+  }
+
+  function handleOpenEdit(booking: Booking) {
+    setSelectedBooking(booking);
+    setModalMode("edit");
     setIsViewModalOpen(true);
   }
 
   function handleCloseView() {
     setSelectedBooking(null);
+    setModalMode("view");
     setIsViewModalOpen(false);
   }
 
@@ -111,6 +131,11 @@ export default function BookingsContainer() {
       credentials: "include",
       body: JSON.stringify(payload),
     });
+
+    if (res.status === 401 || res.status === 403) {
+      await forceLogoutAndRedirect();
+      return;
+    }
 
     if (!res.ok) {
       throw new Error("Failed to update booking");
@@ -139,6 +164,11 @@ export default function BookingsContainer() {
         body: JSON.stringify({ status: "ARCHIVED" }),
       });
 
+      if (res.status === 401 || res.status === 403) {
+        await forceLogoutAndRedirect();
+        return;
+      }
+
       if (!res.ok) throw new Error("Failed to archive booking");
 
       setBookings((prev) =>
@@ -166,13 +196,6 @@ export default function BookingsContainer() {
 
   return (
     <section className="space-y-6">
-      <div>
-        <h3 className="text-2xl font-bold text-gray-800">Booking List</h3>
-        <p className="text-gray-600 mt-1">
-          Manage all customer cleaning service bookings.
-        </p>
-      </div>
-
       <BookingsStats bookings={bookings} />
 
       <BookingsTable
@@ -181,11 +204,13 @@ export default function BookingsContainer() {
         onStatusChange={handleStatusChange}
         onArchive={handleArchive}
         onView={handleOpenView}
+        onEdit={handleOpenEdit}
       />
 
       <ViewBookingModal
         open={isViewModalOpen}
         booking={selectedBooking}
+        initialMode={modalMode}
         onClose={handleCloseView}
         onSave={handleSaveEdit}
       />

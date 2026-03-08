@@ -5,7 +5,7 @@ export default async function AdminDashboardPage() {
   await requireAdminSession();
 
   return (
-    <main className="max-w-7xl mx-auto px-6 py-8">
+    <main className="max-w-[1700px] mx-auto px-8 py-8">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-800 mb-2">Dashboard</h2>
         <p className="text-gray-600">
