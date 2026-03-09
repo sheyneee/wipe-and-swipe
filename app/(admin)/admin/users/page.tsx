@@ -1,5 +1,6 @@
 import { requireAdminSession } from "@/lib/auth/admin-session";
 import { redirect } from "next/navigation";
+import UsersContainer from "@/components/admin/users/UsersContainer";
 
 export default async function UsersPage() {
   const session = await requireAdminSession();
@@ -8,9 +9,5 @@ export default async function UsersPage() {
     redirect("/admin");
   }
 
-  return (
-    <div>
-      Users page
-    </div>
-  );
+  return <UsersContainer />;
 }

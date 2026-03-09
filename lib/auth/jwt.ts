@@ -5,7 +5,7 @@ import { Admin } from "@/modules/admin/admin.model";
 import { dbConnect } from "@/lib/db/mongodb";
 
 export type AdminRole = "SUPER_ADMIN" | "ADMIN";
-export type AdminStatus = "PENDING" | "ACTIVE" | "SUSPENDED";
+export type AdminStatus = "PENDING" | "ACTIVE" | "SUSPENDED" | "ARCHIVED";
 
 export type AdminTokenPayload = {
   userId: string;

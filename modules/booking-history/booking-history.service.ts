@@ -59,6 +59,15 @@ export async function createBookingHistory(args: {
   return history;
 }
 
+export async function getAllBookingHistory() {
+  await dbConnect();
+
+  return BookingHistory.find({})
+    .populate("bookingId", "fullName serviceType preferredDate preferredTime status price")
+    .sort({ createdAt: -1 })
+    .lean();
+}
+
 export async function getBookingHistoryByBookingId(bookingId: string) {
   await dbConnect();
 
@@ -67,6 +76,7 @@ export async function getBookingHistoryByBookingId(bookingId: string) {
   }
 
   return BookingHistory.find({ bookingId })
+    .populate("bookingId", "fullName serviceType preferredDate preferredTime status price")
     .sort({ createdAt: -1 })
     .lean();
 }

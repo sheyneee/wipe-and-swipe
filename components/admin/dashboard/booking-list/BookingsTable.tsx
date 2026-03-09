@@ -72,19 +72,30 @@ export default function BookingsTable({
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [serviceFilter, setServiceFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<BookingStatus | "">("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredAndSortedBookings = useMemo(() => {
     let list = [...bookings];
 
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+
+      list = list.filter((booking) =>
+        (booking.fullName || "").toLowerCase().includes(query)
+      );
+    }
+
     if (serviceFilter) {
       if (serviceFilter === "Others") {
         list = list.filter(
-          (booking) => !STANDARD_SERVICE_SET.has(normalizeService(booking.serviceType))
+          (booking) =>
+            !STANDARD_SERVICE_SET.has(normalizeService(booking.serviceType))
         );
       } else {
         list = list.filter(
           (booking) =>
-            normalizeService(booking.serviceType) === normalizeService(serviceFilter)
+            normalizeService(booking.serviceType) ===
+            normalizeService(serviceFilter)
         );
       }
     }
@@ -144,7 +155,7 @@ export default function BookingsTable({
           return 0;
       }
     });
-  }, [bookings, serviceFilter, statusFilter, sortField, sortDirection]);
+  }, [bookings, searchQuery, serviceFilter, statusFilter, sortField, sortDirection]);
 
   const totalPages = Math.max(
     1,
@@ -231,14 +242,31 @@ export default function BookingsTable({
 
   return (
     <div className="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100">
-      <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-gray-100">
-        <h3 className="text-xl sm:text-2xl font-bold text-gray-800">
-          Booking List
-        </h3>
-        <p className="mt-1 text-sm sm:text-base text-gray-600">
-          Manage all customer cleaning service bookings.
-        </p>
-      </div>
+        <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-gray-100">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+
+            <div>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-800">
+                Booking List
+              </h3>
+              <p className="text-sm sm:text-base text-gray-600">
+                Manage all customer cleaning service bookings.
+              </p>
+            </div>
+
+            <input
+              type="text"
+              placeholder="Search customer name..."
+              value={searchQuery}
+              onChange={(e) => {
+                setCurrentPage(1);
+                setSearchQuery(e.target.value);
+              }}
+              className="w-full sm:w-72 rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-primary"
+            />
+
+          </div>
+        </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[1400px]">
           <thead>

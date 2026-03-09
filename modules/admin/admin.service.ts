@@ -39,6 +39,33 @@ async function requireSuperAdmin(actorAdminId: string) {
   return actor;
 }
 
+  export async function cleanupArchivedAdmins() {
+    await dbConnect();
+
+    const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    await Admin.deleteMany({
+      status: "ARCHIVED",
+      archivedAt: { $lte: cutoff },
+    });
+
+    return { success: true };
+  }
+
+  export async function listAdmins(actorAdminId: string) {
+    await dbConnect();
+
+    await requireSuperAdmin(actorAdminId);
+    await cleanupArchivedAdmins();
+
+    const admins = await Admin.find({})
+      .sort({ createdAt: -1 })
+      .lean<AdminDocument[]>();
+
+    return admins.map((admin) => safeAdminView(admin));
+  }
+
+
 /**
  * Create Admin:
  * - first admin => SUPER_ADMIN + ACTIVE
@@ -169,7 +196,7 @@ export async function updateMyProfile(input: {
 export async function setAdminStatus(input: {
   actorAdminId: string;
   targetAdminId: string;
-  status: Extract<AdminStatus, "ACTIVE" | "SUSPENDED">;
+  status: Extract<AdminStatus, "PENDING" | "ACTIVE" | "SUSPENDED" | "ARCHIVED">;
 }) {
   await dbConnect();
 
@@ -178,12 +205,28 @@ export async function setAdminStatus(input: {
   const target = await Admin.findById(input.targetAdminId);
   if (!target) throw new HttpError(404, "Target admin not found");
 
-  if (target.role === "SUPER_ADMIN") throw new HttpError(400, "Cannot modify Super Admin");
+  if (String(target._id) === input.actorAdminId) {
+    throw new HttpError(400, "You cannot modify your own account status");
+  }
+
+  if (target.role === "SUPER_ADMIN") {
+    throw new HttpError(400, "Cannot modify Super Admin");
+  }
 
   target.status = input.status;
+
+  if (input.status === "ARCHIVED") {
+    target.archivedAt = new Date();
+  } else {
+    target.archivedAt = null;
+  }
+
   await target.save();
 
-  return { success: true };
+  return {
+    success: true,
+    admin: safeAdminView(target as AdminDocument),
+  };
 }
 
 async function sendVerificationEmail(adminId: string, email: string, firstName: string) {

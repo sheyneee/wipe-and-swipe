@@ -47,13 +47,13 @@ export const ChangePasswordSchema = z.object({
 });
 
 export const ApproveAdminSchema = z.object({
-  actorAdminId: z.string().min(1), // super admin
+  actorAdminId: z.string().min(1),
   targetAdminId: z.string().min(1),
-  status: z.enum(["ACTIVE", "SUSPENDED"]),
+  status: z.enum(["PENDING", "ACTIVE", "SUSPENDED", "ARCHIVED"]),
 });
 
 export const DeleteAdminSchema = z.object({
-  actorAdminId: z.string().min(1), // super admin
+  actorAdminId: z.string().min(1),
   targetAdminId: z.string().min(1),
 });
 

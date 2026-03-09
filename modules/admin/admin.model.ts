@@ -1,10 +1,14 @@
 import mongoose, { Schema, type InferSchemaType } from "mongoose";
-import { minLength } from "zod";
 
 export const AdminRoleEnum = ["SUPER_ADMIN", "ADMIN"] as const;
 export type AdminRole = (typeof AdminRoleEnum)[number];
 
-export const AdminStatusEnum = ["PENDING", "ACTIVE", "SUSPENDED"] as const;
+export const AdminStatusEnum = [
+  "PENDING",
+  "ACTIVE",
+  "SUSPENDED",
+  "ARCHIVED",
+] as const;
 export type AdminStatus = (typeof AdminStatusEnum)[number];
 
 const AdminSchema = new Schema(
@@ -33,12 +37,15 @@ const AdminSchema = new Schema(
 
     passwordResetTokenHash: { type: String, select: false },
     passwordResetExpiresAt: { type: Date },
+
+    archivedAt: { type: Date, default: null, index: true },
   },
   { timestamps: true }
 );
 
 AdminSchema.index({ email: 1 }, { unique: true });
 AdminSchema.index({ role: 1, status: 1 });
+AdminSchema.index({ status: 1, archivedAt: 1 });
 
 export type AdminDocument = InferSchemaType<typeof AdminSchema> & {
   _id: mongoose.Types.ObjectId;
@@ -48,6 +55,8 @@ export type AdminDocument = InferSchemaType<typeof AdminSchema> & {
   emailVerifyExpiresAt?: Date;
   passwordResetTokenHash?: string;
   passwordResetExpiresAt?: Date;
+  archivedAt?: Date | null;
 };
 
-export const Admin = mongoose.models.Admin || mongoose.model("Admin", AdminSchema);
+export const Admin =
+  mongoose.models.Admin || mongoose.model("Admin", AdminSchema);

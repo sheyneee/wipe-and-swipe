@@ -37,6 +37,11 @@ export async function handleDeleteAdmin(req: Request) {
   return service.deleteAdmin(body);
 }
 
+export async function handleListAdmins(req: Request) {
+  const { actorAdminId } = (await req.json()) as { actorAdminId: string };
+  return service.listAdmins(actorAdminId);
+}
+
 export async function handleChangePassword(req: Request) {
   const body = ChangePasswordSchema.parse(await req.json());
   return service.changePassword(body);
