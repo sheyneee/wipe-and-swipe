@@ -12,7 +12,7 @@ export const SERVICES: Service[] = [
   {
     value: "residential",
     title: "Residential Cleaning",
-    price: "$40/hour + Goods and Services Tax",
+    price: "$40/hour + GST",
     description: "Perfect for weekly or fortnightly cleaning to keep your home fresh, tidy, and stress-free.",
     bullets: [
       "General dusting & tidying",

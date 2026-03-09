@@ -6,7 +6,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-start justify-center pt-36 overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center pt-28 pb-28 md:pt-32 md:pb-36 overflow-hidden"
     >
       {/* Background image */}
       <HeroBackgroundCarousel />
@@ -19,9 +19,10 @@ export default function Hero() {
       </div> */}
 
       {/* Content */}
-      <div className="relative z-10 max-w-4xl mx-auto px-6 py-12 text-center animate-slide-up">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-primary/10 rounded-full mb-6">
-          <span className="text-brand-primary font-bold text-sm">
+      <div className="relative z-10 max-w-4xl mx-auto px-6 py-12 md:py-16 text-center animate-slide-up">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-teal-100 rounded-full mb-6">
+          <span className="w-2 h-2 bg-[color:var(--brand-primary,#296276)] rounded-full animate-pulse" />
+          <span className="text-[color:var(--brand-primary,#296276)] font-semibold text-sm">
             Professional Cleaning Services
           </span>
         </div>
@@ -105,10 +106,10 @@ export default function Hero() {
       </div>
 
       {/* Bottom wave cut */}
-      <div className="absolute bottom-0 left-0 w-full leading-none z-10">
+      <div className="absolute bottom-0 left-0 w-full leading-none z-10 pointer-events-none">
         <svg
           viewBox="0 0 1440 180"
-          className="block w-full h-[90px] sm:h-[110px] md:h-[130px] lg:h-[150px]"
+          className="block w-full h-[80px] sm:h-[100px] md:h-[120px] lg:h-[140px]"
           preserveAspectRatio="none"
         >
           <path
