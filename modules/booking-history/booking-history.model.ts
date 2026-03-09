@@ -65,6 +65,11 @@ BookingHistorySchema.index({ bookingId: 1, createdAt: -1 });
 BookingHistorySchema.index({ action: 1, createdAt: -1 });
 BookingHistorySchema.index({ "performedBy.userId": 1, createdAt: -1 });
 
+BookingHistorySchema.index(
+  { createdAt: 1 },
+  { expireAfterSeconds: 60 * 60 * 24 * 30 }
+);
+
 export type BookingHistoryDocument = InferSchemaType<typeof BookingHistorySchema> & {
   _id: mongoose.Types.ObjectId;
   createdAt: Date;

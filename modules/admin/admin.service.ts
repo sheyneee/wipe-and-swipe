@@ -17,6 +17,10 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
+function generateSixDigitCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
 function safeAdminView(admin: AdminDocument) {
   return {
     id: String(admin._id),
@@ -338,36 +342,78 @@ export async function forgotPassword(emailRaw: string) {
   const email = normalizeEmail(emailRaw);
   const admin = await Admin.findOne({ email });
 
+  // Always return success to avoid email enumeration
   if (!admin) return { success: true };
 
-  const token = crypto.randomBytes(32).toString("hex");
+  const code = generateSixDigitCode();
 
-  admin.passwordResetTokenHash = sha256(token);
-  admin.passwordResetExpiresAt = new Date(Date.now() + 1000 * 60 * 60);
+  admin.passwordResetTokenHash = sha256(code);
+  admin.passwordResetExpiresAt = new Date(Date.now() + 1000 * 60 * 10); // 10 minutes
 
   await admin.save();
 
-  return { success: true, token };
+  await resend.emails.send({
+    from: env.CONTACT_FROM_EMAIL,
+    to: email,
+    subject: "Your password reset code",
+    html: `
+      <p>Hello ${admin.firstName},</p>
+      <p>You requested to reset your password.</p>
+      <p>Your 6-digit reset code is:</p>
+      <h2 style="letter-spacing: 6px;">${code}</h2>
+      <p>This code expires in 10 minutes.</p>
+      <p>If you did not request this, you may ignore this email.</p>
+    `,
+  });
+
+  return { success: true };
 }
 
-export async function resetPassword(input: { adminId: string; token: string; newPassword: string }) {
+export async function verifyResetCode(emailRaw: string, code: string) {
   await dbConnect();
 
-  const tokenHash = sha256(input.token);
+  const email = normalizeEmail(emailRaw);
+  const codeHash = sha256(code);
 
   const admin = await Admin.findOne({
-    _id: input.adminId,
-    passwordResetTokenHash: tokenHash,
+    email,
+    passwordResetTokenHash: codeHash,
+    passwordResetExpiresAt: { $gt: new Date() },
+  });
+
+  if (!admin) throw new HttpError(400, "Invalid or expired code");
+
+  return { success: true };
+}
+
+export async function resetPassword(input: {
+  email: string;
+  code: string;
+  newPassword: string;
+  confirmPassword: string;
+}) {
+  await dbConnect();
+
+  const email = normalizeEmail(input.email);
+  const codeHash = sha256(input.code);
+
+  const admin = await Admin.findOne({
+    email,
+    passwordResetTokenHash: codeHash,
     passwordResetExpiresAt: { $gt: new Date() },
   }).select("+passwordHash");
 
-  if (!admin) throw new HttpError(400, "Invalid or expired token");
+  if (!admin) throw new HttpError(400, "Invalid or expired code");
 
-  (admin as unknown as { passwordHash: string }).passwordHash = await bcrypt.hash(input.newPassword, 12);
+  (admin as unknown as { passwordHash: string }).passwordHash = await bcrypt.hash(
+    input.newPassword,
+    12
+  );
 
   admin.passwordResetTokenHash = undefined;
   admin.passwordResetExpiresAt = undefined;
 
   await admin.save();
+
   return { success: true };
 }

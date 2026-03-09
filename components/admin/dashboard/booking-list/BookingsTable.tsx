@@ -57,6 +57,7 @@ export default function BookingsTable({
   loading,
   onStatusChange,
   onArchive,
+  onDelete,
   onView,
   onEdit,
 }: {
@@ -64,6 +65,7 @@ export default function BookingsTable({
   loading: boolean;
   onStatusChange: (id: string, status: BookingStatus) => Promise<void> | void;
   onArchive: (id: string) => Promise<void> | void;
+  onDelete: (id: string) => Promise<void> | void;
   onView: (booking: Booking) => void;
   onEdit: (booking: Booking) => void;
 }) {
@@ -184,6 +186,20 @@ export default function BookingsTable({
 
     if (!result.isConfirmed) return;
     await onArchive(id);
+  }
+
+  async function confirmDelete(id: string) {
+    const result = await Swal.fire({
+      title: "Delete booking permanently?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      confirmButtonColor: "#dc2626",
+    });
+
+    if (!result.isConfirmed) return;
+    await onDelete(id);
   }
 
   function formatDate(value: string) {
@@ -505,12 +521,21 @@ export default function BookingsTable({
                         Edit
                       </button>
 
-                      <button
-                        onClick={() => confirmArchive(b._id)}
-                        className="px-3 py-1 bg-amber-100 text-amber-700 font-semibold rounded-lg hover:bg-amber-200 transition-colors"
-                      >
-                        Delete
-                      </button>
+                      {b.status === "ARCHIVED" ? (
+                        <button
+                          onClick={() => confirmDelete(b._id)}
+                          className="px-3 py-1 bg-red-100 text-red-700 font-semibold rounded-lg hover:bg-red-200 transition-colors"
+                        >
+                          Delete
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => confirmArchive(b._id)}
+                          className="px-3 py-1 bg-amber-100 text-amber-700 font-semibold rounded-lg hover:bg-amber-200 transition-colors"
+                        >
+                          Archive
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

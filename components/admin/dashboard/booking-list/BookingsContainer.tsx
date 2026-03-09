@@ -106,6 +106,45 @@ export default function BookingsContainer() {
     }
   }
 
+  async function handleDelete(id: string) {
+    try {
+      const res = await fetch(`/api/admin/bookings/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        await forceLogoutAndRedirect();
+        return;
+      }
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Failed to delete booking");
+      }
+
+      setBookings((prev) => prev.filter((booking) => booking._id !== id));
+
+      setSelectedBooking((prev) => (prev && prev._id === id ? null : prev));
+
+      await Swal.fire({
+        icon: "success",
+        title: "Deleted",
+        text: "Booking permanently deleted successfully.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("handleDelete error:", error);
+      await Swal.fire(
+        "Error",
+        error instanceof Error ? error.message : "Failed to delete booking",
+        "error"
+      );
+    }
+  }
+
   function handleOpenView(booking: Booking) {
     setSelectedBooking(booking);
     setModalMode("view");
@@ -203,6 +242,7 @@ export default function BookingsContainer() {
         loading={loading}
         onStatusChange={handleStatusChange}
         onArchive={handleArchive}
+        onDelete={handleDelete}
         onView={handleOpenView}
         onEdit={handleOpenEdit}
       />

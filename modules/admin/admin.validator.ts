@@ -63,11 +63,30 @@ export const VerifyEmailSchema = z.object({
 });
 
 export const ForgotPasswordSchema = z.object({
-  email: z.string().email().max(254),
+  email: z.string().email({ message: "Please enter a valid email address." }).max(254),
+});
+
+export const VerifyResetCodeSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email address." }).max(254),
+  code: z
+    .string()
+    .regex(/^\d{6}$/, { message: "Code must be exactly 6 digits." }),
 });
 
 export const ResetPasswordSchema = z.object({
-  adminId: z.string().min(1),
-  token: z.string().min(1),
-  newPassword: z.string().min(8).max(72),
+  email: z.string().email({ message: "Please enter a valid email address." }).max(254),
+  code: z
+    .string()
+    .regex(/^\d{6}$/, { message: "Code must be exactly 6 digits." }),
+  newPassword: z
+    .string()
+    .min(8, { message: "Password must contain at least 8 characters." })
+    .max(72, { message: "Password must not exceed 72 characters." }),
+  confirmPassword: z
+    .string()
+    .min(8, { message: "Password must contain at least 8 characters." })
+    .max(72, { message: "Password must not exceed 72 characters." }),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  path: ["confirmPassword"],
+  message: "Passwords do not match.",
 });

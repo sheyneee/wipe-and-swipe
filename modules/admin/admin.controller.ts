@@ -8,6 +8,7 @@ import {
   ResetPasswordSchema,
   UpdateMyProfileSchema,
   VerifyEmailSchema,
+  VerifyResetCodeSchema,
 } from "./admin.validator";
 
 import * as service from "./admin.service";
@@ -55,6 +56,11 @@ export async function handleGenerateEmailVerifyToken(req: Request) {
 export async function handleVerifyEmail(req: Request) {
   const body = VerifyEmailSchema.parse(await req.json());
   return service.verifyEmail(body.adminId, body.token);
+}
+
+export async function handleVerifyResetCode(req: Request) {
+  const body = VerifyResetCodeSchema.parse(await req.json());
+  return service.verifyResetCode(body.email, body.code);
 }
 
 export async function handleForgotPassword(req: Request) {

@@ -196,6 +196,13 @@ export async function deleteBooking(
     throw new HttpError(404, "Booking not found");
   }
 
+  if (existing.status !== "ARCHIVED") {
+    throw new HttpError(
+      400,
+      "Only archived bookings can be permanently deleted."
+    );
+  }
+
   const deleted = await Booking.findByIdAndDelete(id).lean();
 
   if (!deleted) {
