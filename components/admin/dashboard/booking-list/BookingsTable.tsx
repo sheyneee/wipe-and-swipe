@@ -1,56 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import Swal from "sweetalert2";
-
-export type BookingStatus =
-  | "PENDING"
-  | "CONFIRMED"
-  | "DECLINED"
-  | "CANCELLED"
-  | "COMPLETED"
-  | "ARCHIVED";
-
-export type Booking = {
-  _id: string;
-  fullName: string;
-  email: string;
-  phoneNumber: string;
-  serviceType: string;
-  serviceAddress?: string;
-  preferredDate: string;
-  preferredTime?: string;
-  specialRequests?: string;
-  price?: number | null;
-  status: BookingStatus;
-};
-
-type SortField = "name" | "email" | "phone" | "date" | "price" | null;
-type SortDirection = "asc" | "desc";
-
-const ITEMS_PER_PAGE = 5;
-
-const STANDARD_SERVICE_OPTIONS = [
-  "Commercial Cleaning",
-  "Residential Cleaning",
-  "Airbnb Cleaning",
-  "School Cleaning",
-  "End-of-Tenancy Cleaning",
-  "Deep Cleaning",
-  "Window Cleaning",
-  "Driveway & Concrete",
-  "Builder's Clean",
-] as const;
-
-const SERVICE_OPTIONS = [...STANDARD_SERVICE_OPTIONS, "Others"] as const;
-
-const STANDARD_SERVICE_SET = new Set(
-  STANDARD_SERVICE_OPTIONS.map((service) => service.trim().toLowerCase())
-);
-
-function normalizeService(value: string) {
-  return value.trim().toLowerCase();
-}
+import {
+  SERVICE_OPTIONS,
+  formatDate,
+  formatPrice,
+  BOOKING_STATUS_LABELS,
+} from "@/lib/utils/booking-list/bookingsTable.utils";
+import {
+  useBookingsTable,
+  type Booking,
+  type BookingStatus,
+} from "@/hooks/admin/booking-list/useBookingsTable";
 
 export default function BookingsTable({
   bookings,
@@ -69,110 +30,24 @@ export default function BookingsTable({
   onView: (booking: Booking) => void;
   onEdit: (booking: Booking) => void;
 }) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortField, setSortField] = useState<SortField>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-  const [serviceFilter, setServiceFilter] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<BookingStatus | "">("");
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredAndSortedBookings = useMemo(() => {
-    let list = [...bookings];
-
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-
-      list = list.filter((booking) =>
-        (booking.fullName || "").toLowerCase().includes(query)
-      );
-    }
-
-    if (serviceFilter) {
-      if (serviceFilter === "Others") {
-        list = list.filter(
-          (booking) =>
-            !STANDARD_SERVICE_SET.has(normalizeService(booking.serviceType))
-        );
-      } else {
-        list = list.filter(
-          (booking) =>
-            normalizeService(booking.serviceType) ===
-            normalizeService(serviceFilter)
-        );
-      }
-    }
-
-    if (statusFilter) {
-      list = list.filter((booking) => booking.status === statusFilter);
-    } else {
-      list = list.filter((booking) => booking.status !== "ARCHIVED");
-    }
-
-    if (!sortField) return list;
-
-    return list.sort((a, b) => {
-      switch (sortField) {
-        case "name": {
-          const aValue = (a.fullName || "").toLowerCase();
-          const bValue = (b.fullName || "").toLowerCase();
-
-          if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
-          if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
-          return 0;
-        }
-
-        case "email": {
-          const aValue = (a.email || "").toLowerCase();
-          const bValue = (b.email || "").toLowerCase();
-
-          if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
-          if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
-          return 0;
-        }
-
-        case "phone": {
-          const aValue = a.phoneNumber || "";
-          const bValue = b.phoneNumber || "";
-
-          return sortDirection === "asc"
-            ? aValue.localeCompare(bValue, undefined, { numeric: true })
-            : bValue.localeCompare(aValue, undefined, { numeric: true });
-        }
-
-        case "date": {
-          const aValue = new Date(a.preferredDate).getTime();
-          const bValue = new Date(b.preferredDate).getTime();
-
-          return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
-        }
-
-        case "price": {
-          const aValue = a.price ?? 0;
-          const bValue = b.price ?? 0;
-
-          return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
-        }
-
-        default:
-          return 0;
-      }
-    });
-  }, [bookings, searchQuery, serviceFilter, statusFilter, sortField, sortDirection]);
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredAndSortedBookings.length / ITEMS_PER_PAGE)
-  );
-
-  const safeCurrentPage = Math.min(currentPage, totalPages);
-
-  const paginatedBookings = useMemo(() => {
-    const startIndex = (safeCurrentPage - 1) * ITEMS_PER_PAGE;
-    return filteredAndSortedBookings.slice(
-      startIndex,
-      startIndex + ITEMS_PER_PAGE
-    );
-  }, [filteredAndSortedBookings, safeCurrentPage]);
+  const {
+    currentPage,
+    setCurrentPage,
+    sortField,
+    sortDirection,
+    serviceFilter,
+    statusFilter,
+    searchQuery,
+    filteredAndSortedBookings,
+    paginatedBookings,
+    totalPages,
+    safeCurrentPage,
+    handleSearchQueryChange,
+    handleSortChange,
+    handleServiceFilterChange,
+    handleStatusFilterChange,
+    handleResetFilters,
+  } = useBookingsTable({ bookings });
 
   async function confirmArchive(id: string) {
     const result = await Swal.fire({
@@ -202,120 +77,53 @@ export default function BookingsTable({
     await onDelete(id);
   }
 
-  function formatDate(value: string) {
-    if (!value) return "-";
+  async function handleStatusSelectChange(
+    booking: Booking,
+    nextStatus: BookingStatus
+  ) {
+    if (nextStatus === booking.status) return;
 
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
+    const isArchive = nextStatus === "ARCHIVED";
 
-    return date.toLocaleDateString("en-NZ", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    const result = await Swal.fire({
+      title: "Confirm status change",
+      text: isArchive
+        ? "This booking will be archived and permanently deleted within 30 days."
+        : `Change status from ${BOOKING_STATUS_LABELS[booking.status]} to ${BOOKING_STATUS_LABELS[nextStatus]}?`,
+      icon: isArchive ? "warning" : "question",
+      showCancelButton: true,
+      confirmButtonText: isArchive ? "Archive" : "Confirm",
+      confirmButtonColor: isArchive ? "#d97706" : "#296276",
     });
+
+    if (!result.isConfirmed) return;
+
+    await onStatusChange(booking._id, nextStatus);
   }
-
-  function formatPrice(value?: number | null) {
-    if (value === null || value === undefined) return "-";
-    return `$${value.toFixed(2)}`;
-  }
-
-  function handleSortChange(field: SortField, direction: string) {
-    setCurrentPage(1);
-
-    if (!direction) {
-      if (sortField === field) {
-        setSortField(null);
-        setSortDirection("asc");
-      } else {
-        setSortField(null);
-        setSortDirection("asc");
-      }
-      return;
-    }
-
-    setSortField(field);
-    setSortDirection(direction as SortDirection);
-  }
-
-  function handleServiceFilterChange(value: string) {
-    setCurrentPage(1);
-    setServiceFilter(value);
-  }
-
-  function handleStatusFilterChange(value: BookingStatus | "") {
-    setCurrentPage(1);
-    setStatusFilter(value);
-  }
-
-  function handleResetFilters() {
-    setCurrentPage(1);
-    setSortField(null);
-    setSortDirection("asc");
-    setServiceFilter("");
-    setStatusFilter("");
-  }
-
-    async function handleStatusSelectChange(
-      booking: Booking,
-      nextStatus: BookingStatus
-    ) {
-      if (nextStatus === booking.status) return;
-
-      const statusLabels: Record<BookingStatus, string> = {
-        PENDING: "Pending",
-        CONFIRMED: "Confirmed",
-        DECLINED: "Declined",
-        CANCELLED: "Cancelled",
-        COMPLETED: "Completed",
-        ARCHIVED: "Archived",
-      };
-
-      const isArchive = nextStatus === "ARCHIVED";
-
-      const result = await Swal.fire({
-        title: "Confirm status change",
-        text: isArchive
-          ? `This booking will be archived and permanently deleted within 30 days.`
-          : `Change status from ${statusLabels[booking.status]} to ${statusLabels[nextStatus]}?`,
-        icon: isArchive ? "warning" : "question",
-        showCancelButton: true,
-        confirmButtonText: isArchive ? "Archive" : "Confirm",
-        confirmButtonColor: isArchive ? "#d97706" : "#296276",
-      });
-
-      if (!result.isConfirmed) return;
-
-      await onStatusChange(booking._id, nextStatus);
-    }
 
   return (
     <div className="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100">
-        <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-gray-100">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-
-            <div>
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-800">
-                Booking List
-              </h3>
-              <p className="text-sm sm:text-base text-gray-600">
-                Manage all customer cleaning service bookings.
-              </p>
-            </div>
-
-            <input
-              type="text"
-              placeholder="Search customer name..."
-              value={searchQuery}
-              onChange={(e) => {
-                setCurrentPage(1);
-                setSearchQuery(e.target.value);
-              }}
-              className="w-full sm:w-72 rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-primary"
-            />
-
+      <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-800">
+              Booking List
+            </h3>
+            <p className="text-sm sm:text-base text-gray-600">
+              Manage all customer cleaning service bookings.
+            </p>
           </div>
+
+          <input
+            type="text"
+            placeholder="Search customer name..."
+            value={searchQuery}
+            onChange={(e) => handleSearchQueryChange(e.target.value)}
+            className="w-full sm:w-72 rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-primary"
+          />
         </div>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full min-w-[1400px]">
           <thead>
@@ -490,20 +298,23 @@ export default function BookingsTable({
                     {formatPrice(b.price)}
                   </td>
                   <td className="px-6 py-4">
-                  <select
-                    value={b.status}
-                    onChange={(e) =>
-                      handleStatusSelectChange(b, e.target.value as BookingStatus)
-                    }
-                    className="px-3 py-1 rounded-lg text-sm font-semibold border border-gray-200 focus:ring-2 focus:ring-brand-primary outline-none"
-                  >
-                    <option value="PENDING">Pending</option>
-                    <option value="CONFIRMED">Confirmed</option>
-                    <option value="COMPLETED">Completed</option>
-                    <option value="CANCELLED">Cancelled</option>
-                    <option value="DECLINED">Declined</option>
-                    <option value="ARCHIVED">Archived</option>
-                  </select>
+                    <select
+                      value={b.status}
+                      onChange={(e) =>
+                        handleStatusSelectChange(
+                          b,
+                          e.target.value as BookingStatus
+                        )
+                      }
+                      className="px-3 py-1 rounded-lg text-sm font-semibold border border-gray-200 focus:ring-2 focus:ring-brand-primary outline-none"
+                    >
+                      <option value="PENDING">Pending</option>
+                      <option value="CONFIRMED">Confirmed</option>
+                      <option value="COMPLETED">Completed</option>
+                      <option value="CANCELLED">Cancelled</option>
+                      <option value="DECLINED">Declined</option>
+                      <option value="ARCHIVED">Archived</option>
+                    </select>
                   </td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center gap-2">

@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
 import BookingsStats from "@/components/admin/dashboard/booking-list/BookingsStats";
-import BookingsTable, {
-  type Booking,
-  type BookingStatus,
-} from "@/components/admin/dashboard/booking-list/BookingsTable";
+import BookingsTable from "@/components/admin/dashboard/booking-list/BookingsTable";
 import ViewBookingModal from "@/components/admin/dashboard/booking-list/modals/ViewBookingModal";
 import type { UpdateBookingPayload } from "@/components/admin/dashboard/booking-list/modals/EditBookingForm";
+import type {
+  Booking,
+  BookingStatus,
+} from "@/hooks/admin/booking-list/useBookingsTable";
 
 export default function BookingsContainer() {
   const [bookings, setBookings] = useState<Booking[]>([]);

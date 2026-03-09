@@ -1,23 +1,27 @@
 import AdminNavbar from "@/components/admin/layout/navbar/AdminNavbar";
 import AdminFooter from "@/components/admin/layout/footer/AdminFooter";
-import { cookies } from "next/headers";
+import { getAdminSession } from "@/lib/auth/admin-session";
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const token = (await cookies()).get("admin_token")?.value;
-  const hasToken = !!token;
+export default async function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await getAdminSession();
+  const hasSession = !!session;
 
   return (
     <div
       className="w-full min-h-screen flex flex-col"
       style={{
-       background: "linear-gradient(180deg, #f5f9fb 0%, #ffffff 50%, #f5f9fb 100%)",
+        background: "linear-gradient(180deg, #f5f9fb 0%, #ffffff 50%, #f5f9fb 100%)",
       }}
     >
-      {hasToken ? <AdminNavbar /> : null}
+      {hasSession ? <AdminNavbar role={session.role} /> : null}
 
       <main
         className={
-          hasToken
+          hasSession
             ? "flex-1 pt-20"
             : "flex-1 flex items-center justify-center"
         }
@@ -25,7 +29,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         {children}
       </main>
 
-      {hasToken ? <AdminFooter /> : null}
+      {hasSession ? <AdminFooter /> : null}
     </div>
   );
 }
