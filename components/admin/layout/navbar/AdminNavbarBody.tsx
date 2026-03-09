@@ -57,7 +57,7 @@ export default function AdminNavbarBody({ role }: Props) {
 
             {role === "SUPER_ADMIN" && (
               <Link
-                href="/admin/bookings"
+                href="/admin/edit-history"
                 className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
               >
                 Edit History
@@ -122,7 +122,7 @@ export default function AdminNavbarBody({ role }: Props) {
 
               {role === "SUPER_ADMIN" && (
                 <Link
-                  href="/admin/bookings"
+                  href="/admin/edit-history"
                   onClick={() => setOpen(false)}
                   className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
                 >
