@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import type { Booking } from "../BookingsTable";
+import type { Booking } from "@/hooks/admin/booking-list/useBookingsTable";
 import EditBookingForm, { type UpdateBookingPayload } from "./EditBookingForm";
 
 type Props = {

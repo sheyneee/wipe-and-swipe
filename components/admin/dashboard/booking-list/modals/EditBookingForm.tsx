@@ -2,7 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { SERVICES } from "@/lib/data/services";
-import type { Booking, BookingStatus } from "../BookingsTable";
+import type {
+  Booking,
+  BookingStatus,
+} from "@/hooks/admin/booking-list/useBookingsTable";
 
 export type UpdateBookingPayload = {
   fullName?: string;
