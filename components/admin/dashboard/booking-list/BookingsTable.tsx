@@ -240,6 +240,39 @@ export default function BookingsTable({
     setStatusFilter("");
   }
 
+    async function handleStatusSelectChange(
+      booking: Booking,
+      nextStatus: BookingStatus
+    ) {
+      if (nextStatus === booking.status) return;
+
+      const statusLabels: Record<BookingStatus, string> = {
+        PENDING: "Pending",
+        CONFIRMED: "Confirmed",
+        DECLINED: "Declined",
+        CANCELLED: "Cancelled",
+        COMPLETED: "Completed",
+        ARCHIVED: "Archived",
+      };
+
+      const isArchive = nextStatus === "ARCHIVED";
+
+      const result = await Swal.fire({
+        title: "Confirm status change",
+        text: isArchive
+          ? `This booking will be archived and permanently deleted within 30 days.`
+          : `Change status from ${statusLabels[booking.status]} to ${statusLabels[nextStatus]}?`,
+        icon: isArchive ? "warning" : "question",
+        showCancelButton: true,
+        confirmButtonText: isArchive ? "Archive" : "Confirm",
+        confirmButtonColor: isArchive ? "#d97706" : "#296276",
+      });
+
+      if (!result.isConfirmed) return;
+
+      await onStatusChange(booking._id, nextStatus);
+    }
+
   return (
     <div className="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100">
         <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-gray-100">
@@ -441,20 +474,20 @@ export default function BookingsTable({
                     {formatPrice(b.price)}
                   </td>
                   <td className="px-6 py-4">
-                    <select
-                      value={b.status}
-                      onChange={(e) =>
-                        onStatusChange(b._id, e.target.value as BookingStatus)
-                      }
-                      className="px-3 py-1 rounded-lg text-sm font-semibold border border-gray-200 focus:ring-2 focus:ring-brand-primary outline-none"
-                    >
-                      <option value="PENDING">Pending</option>
-                      <option value="CONFIRMED">Confirmed</option>
-                      <option value="COMPLETED">Completed</option>
-                      <option value="CANCELLED">Cancelled</option>
-                      <option value="DECLINED">Declined</option>
-                      <option value="ARCHIVED">Archived</option>
-                    </select>
+                  <select
+                    value={b.status}
+                    onChange={(e) =>
+                      handleStatusSelectChange(b, e.target.value as BookingStatus)
+                    }
+                    className="px-3 py-1 rounded-lg text-sm font-semibold border border-gray-200 focus:ring-2 focus:ring-brand-primary outline-none"
+                  >
+                    <option value="PENDING">Pending</option>
+                    <option value="CONFIRMED">Confirmed</option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                    <option value="DECLINED">Declined</option>
+                    <option value="ARCHIVED">Archived</option>
+                  </select>
                   </td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center gap-2">
