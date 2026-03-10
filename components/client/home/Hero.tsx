@@ -45,7 +45,7 @@ export default function Hero() {
             href="/book-now"
             className="group px-8 py-4 bg-gradient-to-r from-brand-primary to-brand-accent text-white font-semibold rounded-full hover:shadow-xl hover:shadow-brand-primary/30 transition-all duration-300 hover:-translate-y-1 flex items-center gap-2"
           >
-            Book Now
+            Free Quote
             <svg
               className="w-5 h-5 group-hover:translate-x-1 transition-transform"
               fill="none"
