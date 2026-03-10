@@ -38,6 +38,11 @@ export const UpdateMyProfileSchema = z.object({
   firstName: z.string().min(1).max(80).optional(),
   middleName: z.string().max(80).optional(),
   lastName: z.string().min(1).max(80).optional(),
+  email: z
+    .string()
+    .email({ message: "Please enter a valid email address." })
+    .max(254)
+    .optional(),
 });
 
 export const ChangePasswordSchema = z.object({

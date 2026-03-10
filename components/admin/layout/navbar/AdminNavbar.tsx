@@ -73,10 +73,10 @@ export default function AdminNavbar({ role }: Props) {
             )}
 
             <Link
-              href="/admin/settings"
+              href="/admin/profile"
               className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
             >
-              Settings
+              Profile
             </Link>
 
             <AdminLogoutButton />
@@ -140,11 +140,11 @@ export default function AdminNavbar({ role }: Props) {
               )}
 
               <Link
-                href="/admin/settings"
+                href="/admin/profile"
                 onClick={() => setOpen(false)}
                 className="text-gray-700 font-medium hover:text-brand-primary transition-colors"
               >
-                Settings
+                Profile
               </Link>
 
               <div className="pt-2">

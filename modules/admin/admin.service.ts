@@ -180,18 +180,51 @@ export async function updateMyProfile(input: {
   firstName?: string;
   middleName?: string;
   lastName?: string;
+  email?: string;
 }) {
   await dbConnect();
 
   const admin = await Admin.findById(input.adminId);
   if (!admin) throw new HttpError(404, "Admin not found");
 
+  let emailChanged = false;
+
   if (input.firstName !== undefined) admin.firstName = input.firstName;
   if (input.middleName !== undefined) admin.middleName = input.middleName;
   if (input.lastName !== undefined) admin.lastName = input.lastName;
 
+  if (input.email !== undefined) {
+    const normalizedEmail = normalizeEmail(input.email);
+
+    if (normalizedEmail !== admin.email) {
+      const existingAdmin = await Admin.findOne({
+        email: normalizedEmail,
+        _id: { $ne: admin._id },
+      }).lean();
+
+      if (existingAdmin) {
+        throw new HttpError(409, "Email already exists");
+      }
+
+      admin.email = normalizedEmail;
+      admin.emailVerified = false;
+      emailChanged = true;
+    }
+  }
+
   await admin.save();
-  return safeAdminView(admin as AdminDocument);
+
+  if (emailChanged) {
+    await sendVerificationEmail(String(admin._id), admin.email, admin.firstName);
+  }
+
+  return {
+    ...safeAdminView(admin as AdminDocument),
+    emailChanged,
+    message: emailChanged
+      ? "Profile updated. Please verify your new email address."
+      : "Profile updated successfully.",
+  };
 }
 
 /**
