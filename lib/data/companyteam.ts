@@ -29,14 +29,4 @@ export const companyTeamMembers: CompanyTeamMember[] = [
     tags: ["Leadership", "Standards"],
     gradientClass: "from-brand-secondary to-brand-primary",
   },
-  {
-    id: "cleaning-professionals",
-    name: "Our Cleaning Professionals",
-    shortName: "Our Team",
-    role: "Trained. Dedicated",
-    bio:
-      "Our growing team of cleaning professionals are carefully selected and trained to meet our high standards. Each team member is committed to delivering exceptional service and treating your space with the care and respect it deserves.",
-    tags: ["Professional", "Reliable"],
-    gradientClass: "from-brand-accent to-brand-secondary",
-  },
 ];
