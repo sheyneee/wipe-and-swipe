@@ -6,7 +6,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center justify-center pt-28 pb-28 md:pt-32 md:pb-36 overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center pt-28 pb-28 md:pt-28 md:pb-36 overflow-hidden"
     >
       {/* Background image */}
       <HeroBackgroundCarousel />
