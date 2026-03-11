@@ -93,9 +93,16 @@ function getSummary(item: BookingHistoryItem) {
 type Props = {
   records: BookingHistoryItem[];
   loading: boolean;
+  onDeleteOne: (historyId: string) => Promise<void> | void;
+  onDeleteAll: () => Promise<void> | void;
 };
 
-export default function EditHistoryTable({ records, loading }: Props) {
+export default function EditHistoryTable({
+  records,
+  loading,
+  onDeleteOne,
+  onDeleteAll,
+}: Props) {
   const [selectedItem, setSelectedItem] = useState<BookingHistoryItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<SortField>("date");
@@ -178,10 +185,22 @@ export default function EditHistoryTable({ records, loading }: Props) {
     <>
       <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg">
         <div className="border-b border-gray-100 px-4 py-5 sm:px-6">
-          <h2 className="text-2xl font-bold text-gray-900">Booking Edit History</h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Review who edited each booking and inspect the exact field changes.
-          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Booking Edit History</h2>
+              <p className="mt-1 text-sm text-gray-600">
+                Review who edited each booking and inspect the exact field changes.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={onDeleteAll}
+              className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+            >
+              Delete All History
+            </button>
+          </div>
         </div>
 
         <EditHistoryFilters
@@ -196,7 +215,7 @@ export default function EditHistoryTable({ records, loading }: Props) {
         />
 
         <div className="overflow-x-auto">
-          <table className="min-w-[1350px] w-full">
+          <table className="min-w-[1450px] w-full">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
@@ -227,7 +246,7 @@ export default function EditHistoryTable({ records, loading }: Props) {
                   Date Edited
                 </th>
                 <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
-                  View
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -288,13 +307,23 @@ export default function EditHistoryTable({ records, loading }: Props) {
                     </td>
 
                     <td className="px-6 py-4 text-center">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedItem(item)}
-                        className="rounded-xl bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
-                      >
-                        View
-                      </button>
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedItem(item)}
+                          className="rounded-xl bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+                        >
+                          View
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => onDeleteOne(item._id)}
+                          className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

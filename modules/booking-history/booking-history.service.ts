@@ -80,3 +80,29 @@ export async function getBookingHistoryByBookingId(bookingId: string) {
     .sort({ createdAt: -1 })
     .lean();
 }
+
+export async function deleteBookingHistoryById(historyId: string) {
+  await dbConnect();
+
+  if (!mongoose.Types.ObjectId.isValid(historyId)) {
+    throw new HttpError(400, "Invalid history id");
+  }
+
+  const deleted = await BookingHistory.findByIdAndDelete(historyId).lean();
+
+  if (!deleted) {
+    throw new HttpError(404, "History record not found");
+  }
+
+  return deleted;
+}
+
+export async function deleteAllBookingHistory() {
+  await dbConnect();
+
+  const result = await BookingHistory.deleteMany({});
+
+  return {
+    deletedCount: result.deletedCount ?? 0,
+  };
+}
