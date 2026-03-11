@@ -34,6 +34,18 @@ export default function ViewBookingModal({
   const currentBooking = booking;
 
   async function handleSave(payload: UpdateBookingPayload) {
+    const result = await Swal.fire({
+      title: "Save booking changes?",
+      text: "This will update the booking details.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Confirm",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#296276",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setSaving(true);
       await onSave(currentBooking._id, payload);

@@ -12,6 +12,7 @@ import {
   type Booking,
   type BookingStatus,
 } from "@/hooks/admin/booking-list/useBookingsTable";
+import { useEffect } from "react";
 
 export default function BookingsTable({
   bookings,
@@ -21,6 +22,7 @@ export default function BookingsTable({
   onDelete,
   onView,
   onEdit,
+  onFilteredDataChange,
 }: {
   bookings: Booking[];
   loading: boolean;
@@ -29,6 +31,7 @@ export default function BookingsTable({
   onDelete: (id: string) => Promise<void> | void;
   onView: (booking: Booking) => void;
   onEdit: (booking: Booking) => void;
+  onFilteredDataChange?: (rows: Booking[]) => void;
 }) {
   const {
     currentPage,
@@ -38,6 +41,7 @@ export default function BookingsTable({
     serviceFilter,
     statusFilter,
     searchQuery,
+    dateValue,
     filteredAndSortedBookings,
     paginatedBookings,
     totalPages,
@@ -46,8 +50,13 @@ export default function BookingsTable({
     handleSortChange,
     handleServiceFilterChange,
     handleStatusFilterChange,
+    handleDateChange,
     handleResetFilters,
   } = useBookingsTable({ bookings });
+
+  useEffect(() => {
+    onFilteredDataChange?.(filteredAndSortedBookings);
+  }, [filteredAndSortedBookings, onFilteredDataChange]);
 
   async function confirmArchive(id: string) {
     const result = await Swal.fire({
@@ -208,13 +217,16 @@ export default function BookingsTable({
 
               <th className="px-6 py-3">
                 <select
-                  value={sortField === "date" ? sortDirection : ""}
-                  onChange={(e) => handleSortChange("date", e.target.value)}
+                  value={dateValue}
+                  onChange={(e) => handleDateChange(e.target.value)}
                   className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-brand-primary"
                 >
                   <option value="">All</option>
                   <option value="desc">Latest to Oldest</option>
                   <option value="asc">Oldest to Latest</option>
+                  <option value="last7">Last 7 Days</option>
+                  <option value="last30">Last 30 Days</option>
+                  <option value="last60">Last 60 Days</option>
                 </select>
               </th>
 
@@ -320,14 +332,14 @@ export default function BookingsTable({
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => onView(b)}
-                        className="px-3 py-1 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                        className="px-3 py-1 bg-brand-primary text-white font-semibold rounded-lg hover:opacity-90 transition-colors"
                       >
                         View
                       </button>
 
                       <button
                         onClick={() => onEdit(b)}
-                        className="px-3 py-1 bg-blue-100 text-blue-700 font-semibold rounded-lg hover:bg-blue-200 transition-colors"
+                        className="px-3 py-1 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
                       >
                         Edit
                       </button>
@@ -335,14 +347,14 @@ export default function BookingsTable({
                       {b.status === "ARCHIVED" ? (
                         <button
                           onClick={() => confirmDelete(b._id)}
-                          className="px-3 py-1 bg-red-100 text-red-700 font-semibold rounded-lg hover:bg-red-200 transition-colors"
+                          className="px-3 py-1 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
                         >
                           Delete
                         </button>
                       ) : (
                         <button
                           onClick={() => confirmArchive(b._id)}
-                          className="px-3 py-1 bg-amber-100 text-amber-700 font-semibold rounded-lg hover:bg-amber-200 transition-colors"
+                          className="px-3 py-1 bg-amber-500 text-white font-semibold rounded-lg hover:bg-amber-600 transition-colors"
                         >
                           Archive
                         </button>

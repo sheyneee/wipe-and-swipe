@@ -31,10 +31,23 @@ export type Booking = {
 
 export type SortField = "name" | "email" | "phone" | "date" | "price" | null;
 export type SortDirection = "asc" | "desc";
+export type DateRangeFilter = "" | "last7" | "last30" | "last60";
 
 type UseBookingsTableParams = {
   bookings: Booking[];
 };
+
+function isWithinLastDays(dateString: string, days: number) {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return false;
+
+  const now = new Date();
+  const past = new Date();
+  past.setHours(0, 0, 0, 0);
+  past.setDate(now.getDate() - days);
+
+  return date >= past && date <= now;
+}
 
 export function useBookingsTable({ bookings }: UseBookingsTableParams) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -42,6 +55,7 @@ export function useBookingsTable({ bookings }: UseBookingsTableParams) {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [serviceFilter, setServiceFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<BookingStatus | "">("");
+  const [dateRangeFilter, setDateRangeFilter] = useState<DateRangeFilter>("");
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredAndSortedBookings = useMemo(() => {
@@ -74,6 +88,14 @@ export function useBookingsTable({ bookings }: UseBookingsTableParams) {
       list = list.filter((booking) => booking.status === statusFilter);
     } else {
       list = list.filter((booking) => booking.status !== "ARCHIVED");
+    }
+
+    if (dateRangeFilter === "last7") {
+      list = list.filter((booking) => isWithinLastDays(booking.preferredDate, 7));
+    } else if (dateRangeFilter === "last30") {
+      list = list.filter((booking) => isWithinLastDays(booking.preferredDate, 30));
+    } else if (dateRangeFilter === "last60") {
+      list = list.filter((booking) => isWithinLastDays(booking.preferredDate, 60));
     }
 
     if (!sortField) return list;
@@ -130,6 +152,7 @@ export function useBookingsTable({ bookings }: UseBookingsTableParams) {
     searchQuery,
     serviceFilter,
     statusFilter,
+    dateRangeFilter,
     sortField,
     sortDirection,
   ]);
@@ -158,6 +181,9 @@ export function useBookingsTable({ bookings }: UseBookingsTableParams) {
     setCurrentPage(1);
 
     if (!direction) {
+      if (field === "date") {
+        setDateRangeFilter("");
+      }
       setSortField(null);
       setSortDirection("asc");
       return;
@@ -177,14 +203,42 @@ export function useBookingsTable({ bookings }: UseBookingsTableParams) {
     setStatusFilter(value);
   }
 
+  function handleDateChange(value: string) {
+    setCurrentPage(1);
+
+    if (value === "") {
+      setDateRangeFilter("");
+      setSortField(null);
+      setSortDirection("asc");
+      return;
+    }
+
+    if (value === "asc" || value === "desc") {
+      setDateRangeFilter("");
+      setSortField("date");
+      setSortDirection(value);
+      return;
+    }
+
+    if (value === "last7" || value === "last30" || value === "last60") {
+      setDateRangeFilter(value);
+      setSortField(null);
+      setSortDirection("asc");
+    }
+  }
+
   function handleResetFilters() {
     setCurrentPage(1);
     setSortField(null);
     setSortDirection("asc");
     setServiceFilter("");
     setStatusFilter("");
+    setDateRangeFilter("");
     setSearchQuery("");
   }
+
+  const dateValue =
+    dateRangeFilter || (sortField === "date" ? sortDirection : "");
 
   return {
     currentPage,
@@ -194,6 +248,7 @@ export function useBookingsTable({ bookings }: UseBookingsTableParams) {
     serviceFilter,
     statusFilter,
     searchQuery,
+    dateValue,
     filteredAndSortedBookings,
     paginatedBookings,
     totalPages,
@@ -202,6 +257,7 @@ export function useBookingsTable({ bookings }: UseBookingsTableParams) {
     handleSortChange,
     handleServiceFilterChange,
     handleStatusFilterChange,
+    handleDateChange,
     handleResetFilters,
   };
 }

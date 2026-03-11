@@ -11,6 +11,8 @@ import type {
   Booking,
   BookingStatus,
 } from "@/hooks/admin/booking-list/useBookingsTable";
+import BookingExcelExport from "@/components/admin/dashboard/booking-list/BookingExcelExport";
+import AdminCreateBookingModal from "@/components/admin/dashboard/booking-list/modals/AdminCreateBookingModal";
 
 export default function BookingsContainer() {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -18,6 +20,8 @@ export default function BookingsContainer() {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"view" | "edit">("view");
+  const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   useEffect(() => {
     void fetchBookings();
@@ -237,6 +241,20 @@ export default function BookingsContainer() {
   return (
     <section className="space-y-6">
       <BookingsStats bookings={bookings} />
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <button
+            type="button"
+            onClick={() => setCreateModalOpen(true)}
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-brand-primary text-white font-semibold hover:opacity-90 transition-colors"
+          >
+            + Add New Booking
+        </button>
+
+        <BookingExcelExport
+          rows={filteredBookings.length ? filteredBookings : bookings}
+          fileNamePrefix="bookings"
+        />
+      </div>
 
       <BookingsTable
         bookings={bookings}
@@ -246,6 +264,7 @@ export default function BookingsContainer() {
         onDelete={handleDelete}
         onView={handleOpenView}
         onEdit={handleOpenEdit}
+        onFilteredDataChange={setFilteredBookings}
       />
 
       <ViewBookingModal
@@ -254,6 +273,12 @@ export default function BookingsContainer() {
         initialMode={modalMode}
         onClose={handleCloseView}
         onSave={handleSaveEdit}
+      />
+
+      <AdminCreateBookingModal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onCreated={fetchBookings}
       />
     </section>
   );
