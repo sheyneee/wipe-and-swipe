@@ -31,6 +31,7 @@ function safeAdminView(admin: AdminDocument) {
     status: admin.status,
     email: admin.email,
     emailVerified: admin.emailVerified,
+    archivedAt: admin.archivedAt ?? null,
     createdAt: admin.createdAt,
     updatedAt: admin.updatedAt,
   };
@@ -153,15 +154,18 @@ export async function loginAdmin(emailRaw: string, password: string) {
     "Email not verified. Please check your email for the verification link."
   );
 }
-  if (admin.status !== "ACTIVE") {
-    if (admin.status === "PENDING") {
-      throw new HttpError(403, "Your account is pending approval. Please wait for activation.");
-    }
-    if (admin.status === "SUSPENDED") {
-      throw new HttpError(403, "Your account has been suspended. Please contact support.");
-    }
-    throw new HttpError(403, "Your account is not active.");
+if (admin.status !== "ACTIVE") {
+  if (admin.status === "PENDING") {
+    throw new HttpError(403, "Your account is pending approval. Please wait for activation.");
   }
+  if (admin.status === "SUSPENDED") {
+    throw new HttpError(403, "Your account has been suspended. Please contact support.");
+  }
+  if (admin.status === "ARCHIVED") {
+    throw new HttpError(403, "Your account has been archived.");
+  }
+  throw new HttpError(403, "Your account is not active.");
+}
 
   const token = signAdminToken({
     userId: String(admin._id),
@@ -173,7 +177,7 @@ export async function loginAdmin(emailRaw: string, password: string) {
 }
 
 /**
- * Admin edits their own profile (no role / status / email)
+ * Admin edits their own profile (no role / status)
  */
 export async function updateMyProfile(input: {
   adminId: string;
@@ -289,18 +293,35 @@ async function sendVerificationEmail(adminId: string, email: string, firstName: 
 /**
  * SUPER_ADMIN deletes another admin
  */
-export async function deleteAdmin(input: { actorAdminId: string; targetAdminId: string }) {
+export async function deleteAdmin(input: {
+  actorAdminId: string;
+  targetAdminId: string;
+}) {
   await dbConnect();
 
   await requireSuperAdmin(input.actorAdminId);
 
-  const target = await Admin.findById(input.targetAdminId).lean<AdminDocument>();
+  const target = await Admin.findById(input.targetAdminId);
   if (!target) throw new HttpError(404, "Target admin not found");
 
-  if (target.role === "SUPER_ADMIN") throw new HttpError(400, "Super Admin cannot be deleted");
+  if (String(target._id) === input.actorAdminId) {
+    throw new HttpError(400, "You cannot delete your own account");
+  }
 
-  await Admin.deleteOne({ _id: input.targetAdminId });
-  return { success: true };
+  if (target.role === "SUPER_ADMIN") {
+    throw new HttpError(400, "Super Admin cannot be deleted");
+  }
+
+  if (target.status !== "ARCHIVED") {
+    throw new HttpError(
+      400,
+      "Admin must be archived first before permanent deletion."
+    );
+  }
+
+  await Admin.deleteOne({ _id: target._id });
+
+  return { success: true, message: "Admin permanently deleted." };
 }
 
 /**

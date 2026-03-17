@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/auth/admin-session";
-import { listAdmins, setAdminStatus } from "@/modules/admin/admin.service";
+import {
+  deleteAdmin,
+  listAdmins,
+  setAdminStatus,
+} from "@/modules/admin/admin.service";
 
 export async function GET() {
   const session = await requireAdminSession({ redirectToLogin: false });
 
-  if (session.role !== "SUPER_ADMIN") {
+  if (!session || session.role !== "SUPER_ADMIN") {
     return NextResponse.json({ message: "Forbidden" }, { status: 403 });
   }
 
@@ -16,7 +20,7 @@ export async function GET() {
 export async function PATCH(req: Request) {
   const session = await requireAdminSession({ redirectToLogin: false });
 
-  if (session.role !== "SUPER_ADMIN") {
+  if (!session || session.role !== "SUPER_ADMIN") {
     return NextResponse.json({ message: "Forbidden" }, { status: 403 });
   }
 
@@ -29,6 +33,25 @@ export async function PATCH(req: Request) {
     actorAdminId: session.userId,
     targetAdminId: body.targetAdminId,
     status: body.status,
+  });
+
+  return NextResponse.json(result);
+}
+
+export async function DELETE(req: Request) {
+  const session = await requireAdminSession({ redirectToLogin: false });
+
+  if (!session || session.role !== "SUPER_ADMIN") {
+    return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+  }
+
+  const body = (await req.json()) as {
+    targetAdminId: string;
+  };
+
+  const result = await deleteAdmin({
+    actorAdminId: session.userId,
+    targetAdminId: body.targetAdminId,
   });
 
   return NextResponse.json(result);
