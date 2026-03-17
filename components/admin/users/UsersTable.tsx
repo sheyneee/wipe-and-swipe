@@ -86,6 +86,30 @@ export default function UsersTable({
     await onDeleteUser(user.id);
   }
 
+async function handleStatusSelectChange(user: AdminUser, nextStatus: AdminStatus) {
+  if (user.status === nextStatus) return;
+
+  if (nextStatus === "ARCHIVED") {
+    await confirmArchive(user);
+    return;
+  }
+
+  const result = await Swal.fire({
+    title: "Update user status?",
+    text: `Change status of ${formatFullName(user)} to ${nextStatus}?`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes",
+    cancelButtonText: "Cancel",
+    confirmButtonColor: "#2563eb",
+    cancelButtonColor: "#6b7280",
+  });
+
+  if (!result.isConfirmed) return;
+
+  await onStatusChange(user.id, nextStatus);
+}
+
   return (
     <>
       <div className="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100">
@@ -109,7 +133,7 @@ export default function UsersTable({
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1250px]">
+          <table className="w-full min-w-[1350px]">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Name</th>
@@ -251,8 +275,20 @@ export default function UsersTable({
                       {user.emailVerified ? "Yes" : "No"}
                     </td>
 
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {user.status}
+                    <td className="px-6 py-4">
+                      <select
+                        value={user.status}
+                        onChange={(e) =>
+                          void handleStatusSelectChange(user, e.target.value as AdminStatus)
+                        }
+                        disabled={user.role === "SUPER_ADMIN"}
+                        className="px-3 py-1 rounded-lg text-sm font-semibold border border-gray-200 focus:ring-2 focus:ring-brand-primary outline-none disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        <option value="PENDING">Pending</option>
+                        <option value="ACTIVE">Active</option>
+                        <option value="SUSPENDED">Suspended</option>
+                        <option value="ARCHIVED">Archived</option>
+                      </select>
                     </td>
 
                     <td className="px-6 py-4 text-sm text-gray-600">
@@ -264,7 +300,7 @@ export default function UsersTable({
                         <button
                           type="button"
                           onClick={() => openView(user)}
-                          className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                          className="rounded-lg bg-brand-primary px-3 py-2 text-sm font-semibold text-white hover:opacity-90 transition-colors"
                         >
                           View
                         </button>
