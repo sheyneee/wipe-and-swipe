@@ -3,6 +3,7 @@
 
 import { useMemo, useState } from "react";
 import { companyTeamMembers, type CompanyTeamMember } from "@/lib/data/companyteam";
+import Image from "next/image";
 
 type Props = {
   id?: string; 
@@ -49,31 +50,15 @@ export default function MeetTheTeam({
         <div className="max-w-5xl mx-auto">
           <div className="rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-brand-primary/10 to-brand-accent/10 border-4 border-brand-primary/20">
             <div className="px-6 md:px-12 py-12 md:py-16 flex flex-col md:flex-row items-center gap-8">
-              <div
-                className={[
-                  "w-48 h-48 md:w-64 md:h-64 rounded-2xl",
-                  "bg-gradient-to-br",
-                  active.gradientClass,
-                  "flex items-center justify-center flex-shrink-0 shadow-xl",
-                ].join(" ")}
-              >
-                <div className="text-center">
-                  <svg
-                    className="w-24 h-24 text-white mx-auto mb-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
-                  <p className="text-white font-bold text-sm">{active.shortName}</p>
-                </div>
+              <div className="relative w-full max-w-[220px] sm:max-w-[240px] md:max-w-[260px] aspect-[3/4] rounded-2xl overflow-hidden flex-shrink-0 shadow-xl bg-white mx-auto md:mx-0">
+                <Image
+                  src={active.image}
+                  alt={active.name}
+                  fill
+                  className="object-cover object-top"
+                  sizes="(max-width: 640px) 220px, (max-width: 768px) 240px, 260px"
+                  priority
+                />
               </div>
 
               <div className="flex-1">

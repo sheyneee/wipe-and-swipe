@@ -6,6 +6,7 @@ export type CompanyTeamMember = {
   bio: string;
   tags: string[];
   gradientClass: string;
+  image: string; // ✅ ADD THIS
 };
 
 export const companyTeamMembers: CompanyTeamMember[] = [
@@ -15,9 +16,10 @@ export const companyTeamMembers: CompanyTeamMember[] = [
     shortName: "Joyce Daphne",
     role: "Co-Founder. Operations Lead",
     bio:
-      "Joyce brings passion and attention to detail to every cleaning job. With a background in customer care, she ensures that every client receives the white-glove service they deserve.",
+       "Joyce brings passion and attention to detail to every cleaning job. With a background in customer care, she ensures that every client receives the white-glove service they deserve.",
     tags: ["Customer Focus", "Detail-Oriented"],
     gradientClass: "from-brand-primary to-brand-accent",
+    image: "/images/team/ceo-1.png", // ✅ Joyce
   },
   {
     id: "reineer-kien-martinez",
@@ -28,5 +30,6 @@ export const companyTeamMembers: CompanyTeamMember[] = [
       "Reineer leads our cleaning teams with professionalism and expertise. His systematic approach to cleaning and commitment to excellence ensures consistent, high-quality results across every job.",
     tags: ["Leadership", "Standards"],
     gradientClass: "from-brand-secondary to-brand-primary",
+    image: "/images/team/ceo-2.png", // ✅ Reineer
   },
 ];
