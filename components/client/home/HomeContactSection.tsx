@@ -140,7 +140,7 @@ export default function HomeContactSection() {
                 <div>
                   <div className="text-sm text-gray-500">Location</div>
                   <div className="text-lg font-semibold text-gray-800">
-                    155A Harrison Street, Whanganui, New Zealand
+                    Harrison Street, Whanganui, New Zealand
                   </div>
                 </div>
               </div>

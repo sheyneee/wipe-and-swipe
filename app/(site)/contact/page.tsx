@@ -178,7 +178,7 @@ function ContactInfoCard() {
           <div className="flex-1">
             <div className="text-sm text-slate-500">Location</div>
             <div className="font-semibold text-slate-900">
-              155A Harrison Street,
+              Harrison Street,
               <br />
                Whanganui, New Zealand
             </div>
