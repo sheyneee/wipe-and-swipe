@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function ServicesPage() {
   return (
-    <main className="pt-24 pb-16 px-6 bg-gradient-to-b from-white to-teal-50">
+    <main className="pt-32 md:pt-36 pb-16 px-6 bg-gradient-to-b from-white to-teal-50">
       <div className="max-w-7xl mx-auto">
         <ServicesHero
           title="Professional Cleaning Services"
