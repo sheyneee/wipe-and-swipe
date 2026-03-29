@@ -7,7 +7,10 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Cleaning Services in Whanganui | Wipe & Swipe",
   description:
-    "Professional residential and commercial cleaning services in Whanganui. Book a free quote today with Wipe & Swipe Cleaning Services Ltd.",
+    "Professional residential and commercial cleaning services in Whanganui, New Zealand. Book a free quote today with Wipe & Swipe Cleaning Services Ltd.",
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function HomePage() {

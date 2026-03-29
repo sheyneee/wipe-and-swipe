@@ -36,8 +36,9 @@ export default function Hero() {
         </h1>
 
         <p className="text-xl text-gray-700 font-medium mb-8 max-w-2xl mx-auto leading-relaxed">
-          Transform your space with our eco-friendly cleaning solutions. We bring
-          the shine while you enjoy the time.
+          Professional residential and commercial cleaning services in Whanganui, New Zealand.
+          We clean homes, offices, Airbnb properties, and provide deep cleaning with reliable, 
+          high-quality results and flexible scheduling.
         </p>
 
         <div className="flex flex-wrap justify-center gap-4">
