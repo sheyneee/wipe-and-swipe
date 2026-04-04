@@ -1,7 +1,7 @@
 "use client";
 
 import type { AdminProfile } from "./ProfileContainer";
-import { formatAdminRole } from "@/lib/utils/profile/profile.utils";
+import { formatAdminRole } from "@/lib/utils/admin/profile/profile.utils";
 
 export default function ProfileDetailsView({
   profile,

@@ -6,7 +6,7 @@ import {
   formatDate,
   formatPrice,
   BOOKING_STATUS_LABELS,
-} from "@/lib/utils/booking-list/bookingsTable.utils";
+} from "@/lib/utils/admin/booking-list/bookingsTable.utils";
 import {
   useBookingsTable,
   type Booking,

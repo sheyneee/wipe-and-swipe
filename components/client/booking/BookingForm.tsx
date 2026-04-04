@@ -1,177 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { SERVICES } from "@/lib/data/services";
 import Link from "next/link";
-
-type FormState = {
-  fullName: string;
-  email: string;
-  phoneNumber: string;
-  serviceType: string;
-  otherServiceType: string;
-  serviceAddress?: string;
-  preferredDate: string;
-  preferredTime: string;
-  specialRequests?: string;
-};
+import { SERVICES } from "@/lib/data/services";
+import { useBookingForm } from "@/hooks/client/booking/useBookingForm";
 
 type BookingFormProps = {
   initialService?: string;
 };
 
-function formatLocalDate(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function getDateLimits() {
-  const today = new Date();
-  const minDate = new Date(today);
-  minDate.setHours(0, 0, 0, 0);
-
-  const maxDate = new Date(today);
-  maxDate.setFullYear(maxDate.getFullYear() + 1);
-  maxDate.setHours(0, 0, 0, 0);
-
-  return {
-    min: formatLocalDate(minDate),
-    max: formatLocalDate(maxDate),
-  };
-}
-
-function isDateWithinNextYear(dateString: string) {
-  if (!dateString) return false;
-
-  const selected = new Date(`${dateString}T00:00:00`);
-  if (Number.isNaN(selected.getTime())) return false;
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const oneYearFromToday = new Date(today);
-  oneYearFromToday.setFullYear(oneYearFromToday.getFullYear() + 1);
-
-  return selected >= today && selected <= oneYearFromToday;
-}
-
 export default function BookingForm({ initialService = "" }: BookingFormProps) {
-  const [form, setForm] = useState<FormState>({
-    fullName: "",
-    email: "",
-    phoneNumber: "",
-    serviceType: "",
-    otherServiceType: "",
-    serviceAddress: "",
-    preferredDate: "",
-    preferredTime: "",
-    specialRequests: "",
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string>("");
-  const { min, max } = getDateLimits();
-
-  useEffect(() => {
-    if (!initialService) return;
-
-    const matchedService = SERVICES.find((s) => s.value === initialService);
-
-    if (matchedService) {
-      setForm((prev) => ({
-        ...prev,
-        serviceType: matchedService.value,
-        otherServiceType: "",
-      }));
-      return;
-    }
-
-    if (initialService.trim()) {
-      setForm((prev) => ({
-        ...prev,
-        serviceType: "others",
-        otherServiceType: initialService,
-      }));
-    }
-  }, [initialService]);
-
-  const onChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-
-    setForm((prev) => {
-      if (name === "serviceType") {
-        return {
-          ...prev,
-          serviceType: value,
-          otherServiceType: value === "others" ? prev.otherServiceType : "",
-        };
-      }
-
-      return {
-        ...prev,
-        [name]: value,
-      };
-    });
-  };
-
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg("");
-
-    try {
-      if (!isDateWithinNextYear(form.preferredDate)) {
-        throw new Error("Preferred date must be within today and the next 12 months.");
-      }
-
-      const isoDate = new Date(`${form.preferredDate}T00:00:00`).toISOString();
-
-      const finalServiceType =
-        form.serviceType === "others"
-          ? form.otherServiceType.trim()
-          : SERVICES.find((service) => service.value === form.serviceType)?.title || form.serviceType;
-
-      if (!finalServiceType) {
-        throw new Error("Please select a service type.");
-      }
-
-      if (form.serviceType === "others" && !form.otherServiceType.trim()) {
-        throw new Error("Please enter your service type.");
-      }
-
-      const res = await fetch("/api/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: form.fullName,
-          email: form.email,
-          phoneNumber: form.phoneNumber,
-          serviceType: finalServiceType,
-          serviceAddress: form.serviceAddress || undefined,
-          preferredDate: isoDate,
-          preferredTime: form.preferredTime,
-          specialRequests: form.specialRequests || undefined,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data?.message || "Booking failed");
-      }
-
-      setSuccess(true);
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Booking failed");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const {
+    form,
+    loading,
+    success,
+    errorMsg,
+    min,
+    max,
+    onChange,
+    onSubmit,
+  } = useBookingForm(initialService);
 
   if (success) {
     return (
@@ -241,14 +88,21 @@ export default function BookingForm({ initialService = "" }: BookingFormProps) {
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Phone Number <span className="text-red-500">*</span>
             </label>
-            <input
-              name="phoneNumber"
-              value={form.phoneNumber}
-              onChange={onChange}
-              required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all"
-              placeholder="(555) 123-4567"
-            />
+            <div className="flex rounded-xl border border-gray-200 focus-within:border-brand-primary focus-within:ring-2 focus-within:ring-brand-primary/20 overflow-hidden">
+              <span className="px-4 flex items-center bg-gray-50 text-gray-600 font-medium border-r border-gray-200">
+                +64
+              </span>
+              <input
+                name="phoneNumber"
+                type="tel"
+                inputMode="tel"
+                value={form.phoneNumber}
+                onChange={onChange}
+                required
+                className="flex-1 px-4 py-3 outline-none"
+                placeholder="21 123 4567"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -275,9 +129,9 @@ export default function BookingForm({ initialService = "" }: BookingFormProps) {
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all bg-white"
             >
               <option value="">Select a service</option>
-              {SERVICES.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.title}
+              {SERVICES.map((service) => (
+                <option key={service.value} value={service.value}>
+                  {service.title}
                 </option>
               ))}
               <option value="others">Others</option>
@@ -311,7 +165,7 @@ export default function BookingForm({ initialService = "" }: BookingFormProps) {
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all"
               placeholder="123 Main Street, City, ST 12345"
             />
-          </div>       
+          </div>
         </div>
       </div>
 

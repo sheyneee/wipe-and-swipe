@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { AdminProfile } from "../ProfileContainer";
-import { formatAdminRole } from "@/lib/utils/profile/profile.utils";
+import { formatAdminRole } from "@/lib/utils/admin/profile/profile.utils";
 
 type ProfileFormValues = {
   firstName: string;

@@ -8,7 +8,7 @@ import {
   normalizeRequiredText,
   validatePasswordChange,
   validateProfileDetails,
-} from "@/lib/utils/profile/profile.utils";
+} from "@/lib/utils/admin/profile/profile.utils";
 
 export type AdminProfile = {
   id: string;

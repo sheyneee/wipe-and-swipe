@@ -8,7 +8,7 @@ import {
   type SortDirection,
   type SortField,
   type VerifiedFilter,
-} from "@/lib/utils/users/admin-users";
+} from "@/lib/utils/admin/users/admin-users";
 
 export function useUsersTable(users: AdminUser[]) {
   const [currentPage, setCurrentPage] = useState(1);

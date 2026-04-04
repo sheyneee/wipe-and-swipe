@@ -5,7 +5,7 @@ import {
   ITEMS_PER_PAGE,
   STANDARD_SERVICE_SET,
   normalizeService,
-} from "@/lib/utils/booking-list/bookingsTable.utils";
+} from "@/lib/utils/admin/booking-list/bookingsTable.utils";
 
 export type BookingStatus =
   | "PENDING"

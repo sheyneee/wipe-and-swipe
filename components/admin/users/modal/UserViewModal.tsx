@@ -1,7 +1,7 @@
 "use client";
 
 import type { AdminUser } from "@/components/admin/users/UsersTable";
-import { formatDate, formatFullName, formatRole } from "@/lib/utils/users/admin-users";
+import { formatDate, formatFullName, formatRole } from "@/lib/utils/admin/users/admin-users";
 
 type Props = {
   open: boolean;

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
 import { BRAND } from "@/lib/config/brand";
-import { extractApiMessage, isNonEmpty, normalizeEmail, parseResponse } from "@/lib/utils/auth/adminAuth.utils";
+import { extractApiMessage, isNonEmpty, normalizeEmail, parseResponse } from "@/lib/utils/admin/auth/adminAuth.utils";
 import type { Mode } from "@/components/admin/auth/AdminAuthShell";
 import type { LoginPayload } from "@/components/admin/auth/AdminLoginForm";
 import type { RegisterPayload } from "@/components/admin/auth/AdminRegisterForm";

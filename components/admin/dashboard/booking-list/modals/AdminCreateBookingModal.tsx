@@ -122,8 +122,8 @@ export default function AdminCreateBookingModal({
       text: "This will create a new booking record.",
       icon: "question",
       showCancelButton: true,
-      confirmButtonText: "Yes",
       cancelButtonText: "Cancel",
+      confirmButtonText: "Confirm",
       confirmButtonColor: "#296276",
     });
 

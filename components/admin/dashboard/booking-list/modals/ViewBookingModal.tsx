@@ -39,8 +39,8 @@ export default function ViewBookingModal({
       text: "This will update the booking details.",
       icon: "question",
       showCancelButton: true,
-      confirmButtonText: "Confirm",
       cancelButtonText: "Cancel",
+      confirmButtonText: "Confirm",
       confirmButtonColor: "#296276",
     });
 

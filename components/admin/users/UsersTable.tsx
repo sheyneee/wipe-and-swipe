@@ -3,7 +3,7 @@
 import Swal from "sweetalert2";
 import { useUsersTable } from "@/hooks/admin/users/useUsersTable";
 import { useUserViewModal } from "@/hooks/admin/users/useUserViewModal";
-import { formatDate, formatFullName, formatRole } from "@/lib/utils/users/admin-users";
+import { formatDate, formatFullName, formatRole } from "@/lib/utils/admin/users/admin-users";
 import UserViewModal from "@/components/admin/users/modal/UserViewModal";
 
 export type AdminRole = "SUPER_ADMIN" | "ADMIN";
